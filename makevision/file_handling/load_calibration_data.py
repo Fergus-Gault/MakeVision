@@ -1,7 +1,7 @@
-from makevision.core import CalibrationData
+from makevision.core import CalibrationData, FileManager
 from .file_manager_factory import FileManagerFactory
 
-class CalibrationDataFileManager:
+class CalibrationDataFileManager(FileManager):
     """File manager for calibration data."""
 
     def __init__(self, file_manager_factory: FileManagerFactory, path: str) -> None:

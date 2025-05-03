@@ -68,7 +68,7 @@ class CalibrationData(Data):
 
 class Calibrator(ABC):
     @abstractmethod
-    def calibrate(self, images_path: str, aruco_board: ArucoBoardDef) -> CalibrationData:
+    def calibrate(self, images_path: str, aruco_board: ArucoBoardDef) -> None:
         """Calibrate the camera."""
         pass
 

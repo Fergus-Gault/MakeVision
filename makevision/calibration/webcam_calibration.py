@@ -5,14 +5,15 @@ import cv2
 from cv2 import aruco
 
 from makevision.core import ArucoBoard, ArucoBoardDef, CalibrationData, Calibrator, FrameData
-from makevision.file_handling import CalibrationDataFileManager
+from makevision.file_handling import CalibrationDataFileManager, DefaultFileManagerFactory
 
 class WebcamCalibrator(Calibrator):
     def __init__(self, path: str) -> None:
-        self.file_manager = CalibrationDataFileManager(path)
+        file_manager_factory = DefaultFileManagerFactory()
+        self.file_manager = CalibrationDataFileManager(file_manager_factory, path)
         self.calibration_data = None
 
-    def calibrate(self, images_path: str, aruco_board: ArucoBoardDef) -> None:
+    def calibrate(self, images_path: str, aruco_board: ArucoBoardDef = ArucoBoardDef()) -> None:
         self.calibration_data = self.file_manager.load()
         if self.calibration_data:
             return self.calibration_data

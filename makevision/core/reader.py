@@ -4,8 +4,8 @@ import numpy as np
 
 class FrameData(ABC):
     """Generic class for frame data."""
-    @abstractmethod
     @property
+    @abstractmethod
     def frame(self) -> np.ndarray:
         """Get the frame data."""
         pass

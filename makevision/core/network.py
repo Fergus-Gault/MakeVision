@@ -20,6 +20,6 @@ class Network(ABC):
         pass
 
     @abstractmethod
-    def receive_data(self) -> None:
+    def receive_data(self) -> Any:
         """Receive data from the network."""
         pass

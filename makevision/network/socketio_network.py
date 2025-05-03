@@ -5,7 +5,7 @@ class SocketIONetwork(Network):
     def __init__(self, config: dict):
         self.config = config
         self.socket = None
-
+        self.connect()
         self.socket.on('connect', self.on_connect)
 
     def connect(self):
@@ -19,6 +19,9 @@ class SocketIONetwork(Network):
             self.socket.emit(endpoint, data)
         else:
             raise ConnectionError("Socket not connected. Call connect() first.")
+        
+    def receive_data(self):
+        pass
         
     def disconnect(self):
         self.socket.disconnect()

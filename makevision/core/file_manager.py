@@ -3,8 +3,8 @@ from typing import Any, Dict
 
 class Data(ABC):
     """Generic data class."""
-    @abstractmethod
     @property
+    @abstractmethod
     def data(self) -> Any:
         """Get the data."""
         pass
