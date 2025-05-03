@@ -1,6 +1,6 @@
-from src.core import FileManager, Data
+from makevision.core import FileManager, Data
 import yaml
-from src.core.exceptions import FileNotYamlError
+from makevision.core.exceptions import FileNotYamlError
 import os
 
 class YamlFileManager(FileManager):

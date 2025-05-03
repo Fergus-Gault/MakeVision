@@ -1,4 +1,4 @@
-from src.core import (Detector, Network,
+from makevision.core import (Detector, Network,
                       Pipeline, State, Calibrator,
                       Reader, Filter, ObstructionDetector,
                       ArucoBoardDef)

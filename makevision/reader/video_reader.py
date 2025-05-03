@@ -1,4 +1,4 @@
-from src.core import Reader, FrameData
+from makevision.core import Reader, FrameData
 from typing import Tuple
 import cv2
 

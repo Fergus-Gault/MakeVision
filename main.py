@@ -1,6 +1,6 @@
-from src.pipelines import BasicPipeline
-from src.calibration import WebcamCalibrator
-from src.core import (ArucoBoardDef, CalibrationData,
+from makevision.pipelines import BasicPipeline
+from makevision.calibration import WebcamCalibrator
+from makevision.core import (ArucoBoardDef, CalibrationData,
                        ArucoBoard, Detector, Network,
                        State, Reader, Filter, ObstructionDetector,
                        Pipeline)
@@ -17,10 +17,10 @@ def detect_plugin(plugin_name: str) -> object:
 def detect_source(input_path: str) -> Reader:
     """Determine the detector based on the input type."""
     if input_path == "webcam":
-        from src.reader import WebcamReader
+        from makevision.reader import WebcamReader
         return WebcamReader()
     elif os.path.isfile(input_path):
-        from src.reader import VideoReader
+        from makevision.reader import VideoReader
         return VideoReader(input_path)
     else:
         raise ValueError("Invalid input type. Use 'webcam' or a video file path.")
@@ -34,14 +34,14 @@ def detect_model(model_path: str) -> Detector:
     file_ext = os.path.splitext(model_path)[1].lower()
     
     if file_ext in ['.pt', '.pth']:  # YOLO typical extensions
-        from src.detection import YoloDetector
+        from makevision.detection import YoloDetector
         return YoloDetector(model_path)
     elif file_ext in ['.pb', '.tflite']:  # TensorFlow extensions
         raise NotImplementedError("TensorFlow model not yet supported.")
     elif file_ext in ['.onnx']:  # ONNX format
         raise NotImplementedError("ONNX model not yet supported.")
     else:
-        from src.detection import YoloDetector
+        from makevision.detection import YoloDetector
         return YoloDetector(model_path)
     
 def detect_pipeline(pipeline_name: str) -> Pipeline:
@@ -69,7 +69,7 @@ def detect_network(network_path: str) -> Network:
         network_type = config.get("type", "").lower()
         
         if network_type == "socketio":
-            from src.network import SocketIONetwork
+            from makevision.network import SocketIONetwork
             return SocketIONetwork(config)
         elif network_type == "database":
             raise NotImplementedError("Database network not yet supported.")

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from .json_file_manager import JsonFileManager
 from .yaml_file_manager import YamlFileManager
-from src.core import FileManager
+from makevision.core import FileManager
 
 class FileManagerFactory(ABC):
     @abstractmethod

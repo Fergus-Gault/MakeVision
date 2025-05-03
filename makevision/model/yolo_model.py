@@ -1,4 +1,4 @@
-from src.core import Model
+from makevision.core import Model
 from ultralytics import YOLO
 import os
 import torch

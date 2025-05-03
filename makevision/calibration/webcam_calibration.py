@@ -4,8 +4,8 @@ from typing import List, Tuple
 import cv2
 from cv2 import aruco
 
-from src.core import ArucoBoard, ArucoBoardDef, CalibrationData, Calibrator, FrameData
-from src.file_handling import CalibrationDataFileManager
+from makevision.core import ArucoBoard, ArucoBoardDef, CalibrationData, Calibrator, FrameData
+from makevision.file_handling import CalibrationDataFileManager
 
 class WebcamCalibrator(Calibrator):
     def __init__(self, path: str) -> None:

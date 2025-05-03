@@ -1,4 +1,4 @@
-from src.core import Network
+from makevision.core import Network
 import socketio
 
 class SocketIONetwork(Network):

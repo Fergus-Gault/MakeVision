@@ -1,4 +1,4 @@
-from src.core import Detector
+from makevision.core import Detector
 from ultralytics import YOLO
 
 class YoloDetector(Detector):

@@ -1,7 +1,7 @@
-from src.core import FileManager, Data
+from makevision.core import FileManager, Data
 import json
 import numpy as np
-from src.core.exceptions import FileNotJsonError
+from makevision.core.exceptions import FileNotJsonError
 import os
 
 class JsonFileManager(FileManager):

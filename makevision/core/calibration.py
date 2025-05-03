@@ -5,7 +5,7 @@ import numpy as np
 from cv2 import aruco
 from cv2.aruco import ArucoDetector, CharucoBoard, DetectorParameters
 
-from src.core import Data, FrameData
+from makevision.core import Data, FrameData
 
 @dataclass
 class ArucoBoardDef:

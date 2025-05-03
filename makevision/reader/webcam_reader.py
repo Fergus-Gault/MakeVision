@@ -1,5 +1,5 @@
-from src.core import Reader, FrameData
-from src.core.exceptions import InvalidWebcamSourceError
+from makevision.core import Reader, FrameData
+from makevision.core.exceptions import InvalidWebcamSourceError
 import cv2
 import numpy as np
 

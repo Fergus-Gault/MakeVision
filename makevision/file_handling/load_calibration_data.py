@@ -1,4 +1,4 @@
-from src.core import CalibrationData
+from makevision.core import CalibrationData
 from .file_manager_factory import FileManagerFactory
 
 class CalibrationDataFileManager:

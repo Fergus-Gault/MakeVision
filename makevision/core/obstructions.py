@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.core import FrameData
+from makevision.core import FrameData
 from typing import List
 
 class ObstructionDetector(ABC):
