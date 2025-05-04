@@ -24,13 +24,20 @@ def main():
     # Initialize components from plugin or use the ones from args
     reader = plugin_components["reader"]() \
         if plugin_components["reader"] is not None else detect_source(args.input)
-    calibrator = WebcamCalibrator(args.calibration_data)
-    detector = plugin_components["detector"]() \
-        if plugin_components["detector"] is not None else detect_model(args.model)
+    calibrator = plugin_components["calibrator"](args.calibration_data) \
+        if plugin_components["calibrator"] is not None else detect_calibrator(args.calibration_data)
+    
+    # Detect the model based on the provided model path
+    model = detect_model(args.model)
+    # Create a detector based on the model type
+    detector = plugin_components["detector"](model) \
+        if plugin_components["detector"] is not None else detect_detector(model)
+    
     network = plugin_components["network"]() \
         if plugin_components["network"] is not None else detect_network(args.network)
     filter = plugin_components["filter"]() \
         if plugin_components["filter"] is not None else detect_filter(args.filter)
+    
     obstruction_detector = plugin_components["obstruction_detector"]() \
         if plugin_components["obstruction_detector"] is not None \
             else detect_obstruction_detector(args.obstruction_detector)

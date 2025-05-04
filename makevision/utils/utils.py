@@ -5,8 +5,13 @@ from makevision.core import (
     Filter,
     ObstructionDetector,
     State,
-    Pipeline
+    Pipeline,
+    Calibrator,
+    Model
 )
+from makevision.pipelines import BasicPipeline
+from makevision.calibration import WebcamCalibrator
+from makevision.model import YoloModel, TfModel, OnnxModel
 import os
 import inspect
 from types import ModuleType
@@ -26,7 +31,8 @@ def detect_plugin_components(plugin_name: str) -> object:
         "filter": None,
         "obstruction_detector": None,
         "state": None,
-        "pipeline": None
+        "pipeline": None,
+        "calibrator": None,
     }
     
     for module_file in os.listdir(plugin_path):
@@ -39,10 +45,12 @@ def detect_plugin_components(plugin_name: str) -> object:
         try:
             module = load_module(module_path, module_name)
             
-            for name, obj in inspect.getmembers(module, inspect.isclass):
+            for _, obj in inspect.getmembers(module, inspect.isclass):
                 # Check if the class inherits from any of our core types
                 if issubclass(obj, Reader) and obj != Reader:
                     plugin_components["reader"] = obj
+                elif issubclass(obj, Calibrator) and obj != Calibrator:
+                    plugin_components["calibrator"] = obj
                 elif issubclass(obj, Detector) and obj != Detector:
                     plugin_components["detector"]= obj
                 elif issubclass(obj, Network) and obj != Network:
@@ -83,8 +91,8 @@ def detect_source(input_path: str) -> Reader:
     else:
         raise ValueError("Invalid input type. Use 'webcam' or a video file path.")
     
-def detect_model(model_path: str) -> Detector:
-    """Determine the detector based on the model path."""
+def detect_model(model_path: str) -> Model:
+    """Determine the model type based on the model path."""
     if model_path is None or not os.path.isfile(model_path):
         raise ValueError("Invalid model path.")
     
@@ -92,18 +100,33 @@ def detect_model(model_path: str) -> Detector:
     file_ext = os.path.splitext(model_path)[1].lower()
     
     if file_ext in ['.pt', '.pth']:  # YOLO typical extensions
-        from makevision.detection import YoloDetector
-        return YoloDetector(model_path)
+        from makevision.model import YoloModel
+        return YoloModel(model_path)
     elif file_ext in ['.pb', '.tflite']:  # TensorFlow extensions
         raise NotImplementedError("TensorFlow model not yet supported.")
     elif file_ext in ['.onnx']:  # ONNX format
         raise NotImplementedError("ONNX model not yet supported.")
     else:
+        from makevision.model import YoloModel
+        return YoloModel(model_path)
+    
+def detect_detector(model: Model) -> Detector:
+    """Determine the detector based on the model path."""
+    if model is None or not isinstance(model, Model):
+        raise ValueError("Invalid model.")
+    elif isinstance(model, YoloModel):
         from makevision.detection import YoloDetector
-        return YoloDetector(model_path)
+        return YoloDetector(model)
+    elif isinstance(model, TfModel):  # TensorFlow extensions
+        raise NotImplementedError("TensorFlow model not yet supported.")
+    elif isinstance(model, OnnxModel):  # ONNX format
+        raise NotImplementedError("ONNX model not yet supported.")
+    else:
+        from makevision.detection import YoloDetector
+        return YoloDetector(model)
     
 def detect_pipeline(pipeline_name: str) -> Pipeline:
-    return None
+    return BasicPipeline()
 
 def detect_filter(filter_name: str) -> Filter:
     return None
@@ -113,6 +136,9 @@ def detect_state(state_config: str) -> State:
 
 def detect_obstruction_detector(config: str) -> ObstructionDetector:
     return None
+
+def detect_calibrator(calibration_path: str) -> Calibrator:
+    return WebcamCalibrator(calibration_path)
     
 
 def detect_network(network_path: str) -> Network:
