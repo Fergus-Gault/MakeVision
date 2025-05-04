@@ -31,7 +31,7 @@ class BasicPipeline(Pipeline):
 
             network.send_data(filtered_detections)
 
-            detector.visualize(frame)
+            detector.visualize(frame, detections)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break

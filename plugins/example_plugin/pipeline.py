@@ -18,9 +18,10 @@ class ExamplePipeline(Pipeline):
             results = filter.apply(results)
             state.update(results)
 
+            detector.visualize(frame, results)
+
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
         reader.release()
         cv2.destroyAllWindows()
-            

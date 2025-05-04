@@ -25,10 +25,11 @@ class Detector(ABC):
         pass
 
     @abstractmethod
-    def visualize(self, results: List) -> None:
+    def visualize(self, frame: FrameData, results: List) -> None:
         """
         Visualize the detection results.
         Args:
+            frame (FrameData): The frame to visualize.
             results (List): Detection results to visualize.
         """
         pass
