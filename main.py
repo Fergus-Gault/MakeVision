@@ -43,7 +43,7 @@ def main():
         plugin_components["network"]() if plugin_components["network"] else None
     
     filter = detect_filter(args.filter) if args.filter else \
-        plugin_components["filter"]() if plugin_components["filter"] else None
+        plugin_components["filter"](model) if plugin_components["filter"] else None
     
     obstruction_detector = detect_obstruction_detector(args.obstruction_detector) \
         if args.obstruction_detector else \
