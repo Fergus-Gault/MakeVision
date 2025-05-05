@@ -12,9 +12,11 @@ def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Run the basic pipeline.")
     parser.add_argument("input", help="Type of input (webcam or video file).")
+    parser.add_argument("--loop", action="store_true", help="Loop the video input.")
     parser.add_argument("--plugin", required=True, help="Specify the plugin to use.")
     parser.add_argument("--pipeline", required=False, help="Specify the pipeline to use.")
     parser.add_argument("--calibration-data", required=False, help="Path to the calibration data file.")
+    parser.add_argument("--calibrate", action="store_true", help="Calibrate the camera.")
     parser.add_argument("--model", required=False, help="Path to the YOLO model file.")
     parser.add_argument("--network", required=False, help="Path to the network configuration file.")
     parser.add_argument("--filter", required=False, help="Specify the filter to use.")
@@ -28,10 +30,10 @@ def main():
     plugin_components = detect_plugin_components(args.plugin)
 
     # Initialize components based on provided arguments first, then from plugin if not provided
-    reader = detect_source(args.input) if args.input else plugin_components["reader"]()
+    reader = detect_source(args.input, args.loop) if args.input else plugin_components["reader"]()
     
-    calibrator = detect_calibrator(args.calibration_data, args.plugin) \
-        if args.calibration_data else \
+    calibrator = detect_calibrator(args.calibration_data, args.plugin, args.calibrate) \
+        if (args.calibration_data or args.calibrate) else \
         plugin_components["calibrator"]() if plugin_components["calibrator"] else None
     
     # For model and detector

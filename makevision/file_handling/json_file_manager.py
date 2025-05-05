@@ -30,11 +30,13 @@ class JsonFileManager(FileManager):
         """Load data from a JSON file."""
         if not path.endswith('.json'):
             raise FileNotJsonError()
-        
-        if not os.path.exists(path):
-            return {}
 
-        with open(path, 'r') as file:
-            data = json.load(file)
+        try:
+            with open(path, 'r') as file:
+                data = json.load(file)
+        except json.JSONDecodeError:
+            with open(path, 'w') as file:
+                data = {}
+                file.write(f"{data}")
 
         return data

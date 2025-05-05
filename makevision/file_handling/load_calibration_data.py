@@ -10,7 +10,9 @@ class CalibrationDataFileManager(FileManager):
 
     def load(self) -> CalibrationData:
         data = self.file_manager.load(self.path)
-        return CalibrationData(data=data)
+        if data == {}:
+            return None
+        return CalibrationData(data)
 
     def save(self, data: CalibrationData) -> None:
         self.file_manager.save(self.path, data)

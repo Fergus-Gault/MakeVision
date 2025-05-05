@@ -11,8 +11,8 @@ from makevision.core import Data, FrameData
 class ArucoBoardDef:
     """Holds the ArUco board parameters."""
     aruco_size: tuple = (6, 8)
-    square_length: int = 30
-    marker_length: int = 25
+    square_length: int = 34
+    marker_length: int = 27
     aruco_dict: int = aruco.DICT_4X4_50 
 
 @dataclass
@@ -53,10 +53,10 @@ class CalibrationData(Data):
     def convert(self, data: dict) -> None:
         """Convert the data to a numpy array."""
         try:
-            self.camera_matrix = np.array(data.get("mtx")) \
-                if data.get("mtx") is not None else None
-            self.dist_coeffs = np.array(data.get("dist")) \
-                if data.get("dist") is not None else None
+            self.camera_matrix = np.array(data.get("camera_mtx")) \
+                if data.get("camera_mtx") is not None else None
+            self.dist_coeffs = np.array(data.get("dist_coeffs")) \
+                if data.get("dist_coeffs") is not None else None
             self.newcamera_mtx = np.array(data.get("newcamera_mtx")) \
                 if data.get("newcamera_mtx") is not None else None
             self.roi = np.array(data.get("roi")) \

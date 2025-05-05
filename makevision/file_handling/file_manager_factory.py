@@ -12,6 +12,8 @@ class FileManagerFactory(ABC):
 
 class DefaultFileManagerFactory(FileManagerFactory):
     def create_file_manager(self, path: str) -> FileManager:
+        if not path:
+            return None
         file_extension = os.path.splitext(path)[1].lower()
 
         if file_extension == '.json':

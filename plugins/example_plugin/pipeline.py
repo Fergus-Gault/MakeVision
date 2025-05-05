@@ -3,12 +3,16 @@ import cv2
 
 class ExamplePipeline(Pipeline):
     def run(self, reader: Reader, detector: Detector, 
-            filter: Filter, state: State):
+            filter: Filter, state: State, calibrator: Calibrator):
+
+        calibrator.calibrate("./plugins/example_plugin/wide_angle_cam/")
 
         while True:
             success, frame = reader.read()
             if not success:
                 break
+
+            calibrator.undistort(frame)
 
             results = detector.detect(frame)
             results = filter.apply(results)

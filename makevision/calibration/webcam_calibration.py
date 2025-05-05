@@ -8,15 +8,18 @@ from makevision.core import ArucoBoard, ArucoBoardDef, CalibrationData, Calibrat
 from makevision.file_handling import CalibrationDataFileManager, DefaultFileManagerFactory
 
 class WebcamCalibrator(Calibrator):
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str = None) -> None:
         file_manager_factory = DefaultFileManagerFactory()
         self.file_manager = CalibrationDataFileManager(file_manager_factory, path)
         self.calibration_data = None
 
-    def calibrate(self, images_path: str, aruco_board: ArucoBoardDef = ArucoBoardDef()) -> None:
+    def calibrate(self, images_path: str = None, aruco_board: ArucoBoardDef = ArucoBoardDef()) -> None:
         self.calibration_data = self.file_manager.load()
         if self.calibration_data:
-            return self.calibration_data
+            return
+        
+        if not images_path:
+            raise ValueError("No images path provided for calibration.")
         
         # Define ChArUco board
         aruco_board = self._get_aruco_board(aruco_board)
@@ -26,14 +29,14 @@ class WebcamCalibrator(Calibrator):
         all_charuco_ids, all_charuco_corners = self._get_charuco_corners_and_ids(images, aruco_board)
 
         # Calibrate the camera
-        _, mtx, dist, _, _ = cv2.aruco.calibrateCameraCharuco(
+        _, camera_mtx, dist_coeffs, _, _ = cv2.aruco.calibrateCameraCharuco(
             all_charuco_corners, all_charuco_ids, 
             aruco_board.board, img_size, 
             None, None)
         
-        w, h = img_size[:2]
-        new_mtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
-        self.calibration_data = CalibrationData(mtx, dist, new_mtx, roi)
+        h, w = img_size[:2]
+        newcamera_mtx, roi = cv2.getOptimalNewCameraMatrix(camera_mtx, dist_coeffs, (w, h), 1, (w, h))
+        self.calibration_data = CalibrationData({"camera_mtx": camera_mtx, "dist_coeffs": dist_coeffs, "newcamera_mtx": newcamera_mtx, "roi": roi})
         
         # Save the generated calibration data
         self.file_manager.save(self.calibration_data)
@@ -43,22 +46,34 @@ class WebcamCalibrator(Calibrator):
         if frame is None or frame.frame is None or self.calibration_data is None:
             return frame
         
-        undistorted_frame = cv2.undistort(
-            frame.frame, 
-            self.calibration_data.camera_matrix, 
-            self.calibration_data.dist_coeffs, 
-            None,
-            self.calibration_data.newcamera_mtx)
+        # Lazy initialization of undistortion maps
+        if not hasattr(self, '_undistort_maps'):
+            h, w = frame.frame.shape[:2]
+            self._undistort_maps = cv2.initUndistortRectifyMap(
+                self.calibration_data.camera_matrix,
+                self.calibration_data.dist_coeffs,
+                None,
+                self.calibration_data.newcamera_mtx,
+                (w, h),
+                cv2.CV_16SC2
+            )
         
-        # Replace the frame with the undistorted one
-        x,y,w,h = self.calibration_data.roi
-        new_frame = undistorted_frame[y:y+h, x:x+w]
-        frame.frame = new_frame
+        # Use remap which is faster than undistort
+        undistorted_frame = cv2.remap(
+            frame.frame, 
+            self._undistort_maps[0], 
+            self._undistort_maps[1], 
+            cv2.INTER_LINEAR
+        )
+        
+        # Crop to ROI
+        x, y, w, h = self.calibration_data.roi
+        frame.frame = undistorted_frame[y:y+h, x:x+w]
         
         return frame
     
 
-    def _get_charuco_corners_and_ids(images: List[str], aruco_board: ArucoBoard) -> Tuple[List, List]:
+    def _get_charuco_corners_and_ids(self, images: List[str], aruco_board: ArucoBoard) -> Tuple[List, List]:
         all_charuco_ids = []
         all_charuco_corners = []
 
@@ -68,9 +83,9 @@ class WebcamCalibrator(Calibrator):
             marker_corners, marker_ids, _ = aruco_board.detector.detectMarkers(gray)
 
             if len(marker_ids) > 0:
-                charuco_corners, charuco_ids = aruco_board.detector.interpolateCornersCharuco(
+                ret, charuco_corners, charuco_ids = aruco.interpolateCornersCharuco(
                     marker_corners, marker_ids, gray, aruco_board.board)
-                if charuco_corners is not None and charuco_ids is not None:
+                if ret > 0:
                     all_charuco_corners.append(charuco_corners)
                     all_charuco_ids.append(charuco_ids)
 
@@ -79,7 +94,7 @@ class WebcamCalibrator(Calibrator):
 
     def _get_aruco_board(self, aruco_board: ArucoBoardDef) -> ArucoBoard:
         def_aruco_dict = aruco.getPredefinedDictionary(aruco_board.aruco_dict)
-        board = aruco.CharucoBoard(aruco_board.aruco_dict, 
+        board = aruco.CharucoBoard(aruco_board.aruco_size, 
                                    aruco_board.square_length, 
                                    aruco_board.marker_length, 
                                    def_aruco_dict)
