@@ -3,7 +3,7 @@ from collections import defaultdict
 
 class ExampleFilter(Filter):
     def __init__(self, model):
-        super().__init__(model)
+        self.model = model
 
     def apply(self, results):
         """Apply the filter to the results."""
@@ -21,9 +21,17 @@ class ExampleFilter(Filter):
             "black": 1,
             "red": 7,
             "yellow": 7,
+            "arm": 3,
+            "hole": 6,
         }
 
         for result in results:
-            pass
+            classname = self.model.labels[int(result.boxes.cls[0])]
+            if classname in class_limits:
+                counts[classname] += 1
+                if counts[classname] <= class_limits[classname]:
+                    filtered_results.append(result)
+            else:
+                filtered_results.append(result)
 
-        return results
+        return filtered_results

@@ -81,14 +81,14 @@ def load_module(module_path: str, module_name: str) -> ModuleType:
     return module
 
 
-def detect_source(input_path: str) -> Reader:
+def detect_source(input_path: str, loop: bool) -> Reader:
     """Determine the detector based on the input type."""
     if input_path == "webcam":
         from makevision.reader import WebcamReader
         return WebcamReader()
     elif os.path.isfile(input_path):
         from makevision.reader import VideoReader
-        return VideoReader(input_path)
+        return VideoReader(input_path, loop)
     else:
         raise ValueError("Invalid input type. Use 'webcam' or a video file path.")
     
@@ -139,9 +139,9 @@ def detect_state(state_config: str) -> State:
 def detect_obstruction_detector(config: str) -> ObstructionDetector:
     return None
 
-def detect_calibrator(calibration_path: str, plugin_path: str) -> Calibrator:
+def detect_calibrator(calibration_path: str, plugin_path: str, calibrate: bool) -> Calibrator:
     if calibration_path is None:
-        return None
+        return WebcamCalibrator() if calibrate else None
     calibration_path = check_paths(calibration_path, plugin_path)
     return WebcamCalibrator(calibration_path)
     
