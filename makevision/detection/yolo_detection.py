@@ -6,6 +6,7 @@ from makevision.core import Model
 
 class YoloDetector(Detector):
     def __init__(self, model: Model):
+        self._model = model
         self.model = model.model
         self.use_half = True if self.model.device == 'cuda' else False
 
@@ -36,8 +37,8 @@ class YoloDetector(Detector):
 
             for box, conf, cls in zip(boxes, confidences, class_ids):
                 x1, y1, x2, y2 = map(int, box)
-                label = f"Class {int(cls)}: {conf:.2f}"
+                label = f"Class {self._model.labels[int(cls)]}: {conf:.2f}"
                 cv2.rectangle(frame.frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(frame.frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.putText(frame.frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
 
         cv2.imshow("Detection", frame.frame)
