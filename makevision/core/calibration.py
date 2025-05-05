@@ -68,11 +68,11 @@ class CalibrationData(Data):
 
 class Calibrator(ABC):
     @abstractmethod
-    def calibrate(self, images_path: str, aruco_board: ArucoBoardDef) -> None:
+    def calibrate(self, images_path: str, aruco_board: ArucoBoardDef, *args, **kwargs) -> None:
         """Calibrate the camera."""
         pass
 
     @abstractmethod
-    def undistort(self, frame: FrameData) -> FrameData:
+    def undistort(self, frame: FrameData, *args, **kwargs) -> FrameData:
         """Undistort the frame."""
         pass

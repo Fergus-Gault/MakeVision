@@ -14,17 +14,17 @@ class Reader(ABC):
     """Abstract base class for reading data from a source."""
 
     @abstractmethod
-    def read(self) -> Tuple[bool, FrameData]:
+    def read(self, *args, **kwargs) -> Tuple[bool, FrameData]:
         """Read data from the source."""
         pass
 
     @abstractmethod
-    def release(self) -> None:
+    def release(self, *args, **kwargs) -> None:
         """Close the reader."""
         pass
 
     @abstractmethod
-    def reset(self) -> None:
+    def reset(self, *args, **kwargs) -> None:
         """Reset the reader."""
         pass
 

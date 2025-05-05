@@ -6,7 +6,7 @@ class ObstructionDetector(ABC):
     """Abstract base class for obstruction detection algorithms."""
 
     @abstractmethod
-    def detect_obstruction(self, frame: FrameData) -> bool:
+    def detect_obstruction(self, frame: FrameData, *args, **kwargs) -> bool:
         """
         Detects obstructions in the given image.
         Args:
@@ -17,7 +17,7 @@ class ObstructionDetector(ABC):
         pass
 
     @abstractmethod
-    def get_obstruction_coordinates(self, frame: FrameData) -> List:
+    def get_obstruction_coordinates(self, frame: FrameData, *args, **kwargs) -> List:
         """
         Returns the coordinates of the detected obstruction.
         Args:

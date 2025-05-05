@@ -10,16 +10,16 @@ class Network(ABC):
         pass
 
     @abstractmethod
-    def disconnect(self) -> None:
+    def disconnect(self, *args, **kwargs) -> None:
         """Disconnect from the network."""
         pass
 
     @abstractmethod
-    def send_data(self, data: Any) -> None:
+    def send_data(self, data: Any, *args, **kwargs) -> None:
         """Send data over the network."""
         pass
 
     @abstractmethod
-    def receive_data(self) -> Any:
+    def receive_data(self, *args, **kwargs) -> Any:
         """Receive data from the network."""
         pass

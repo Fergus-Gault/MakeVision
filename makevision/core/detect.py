@@ -14,7 +14,7 @@ class Detector(ABC):
         self.model = model
 
     @abstractmethod
-    def detect(self, frame: FrameData) -> List:
+    def detect(self, frame: FrameData, *args, **kwargs) -> List:
         """
         Detect objects in the given frame.
         Args:
@@ -25,7 +25,7 @@ class Detector(ABC):
         pass
 
     @abstractmethod
-    def visualize(self, frame: FrameData, results: List) -> None:
+    def visualize(self, frame: FrameData, results: List, *args, **kwargs) -> None:
         """
         Visualize the detection results.
         Args:
