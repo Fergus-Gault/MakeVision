@@ -1,2 +1,5 @@
 env/
 __pycache__/
+*.mp4
+camera_calibration.json
+wide_angle_cam/
