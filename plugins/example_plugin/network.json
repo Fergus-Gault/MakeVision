@@ -1,7 +1,0 @@
-{
-    "type": "socketio",
-    "url": "http://poolpal.joshn.uk",
-    "endpoints": [
-        "test_endpoint"
-    ]
-}

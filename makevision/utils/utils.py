@@ -17,6 +17,7 @@ import inspect
 from types import ModuleType
 import importlib.util
 import json
+import inspect
 
 def detect_plugin_components(plugin_name: str) -> object:
     """Detects a plugin in the plugin folder based on the name."""
@@ -91,10 +92,11 @@ def detect_source(input_path: str) -> Reader:
     else:
         raise ValueError("Invalid input type. Use 'webcam' or a video file path.")
     
-def detect_model(model_path: str) -> Model:
+def detect_model(model_path: str, plugin_path: str) -> Model:
     """Determine the model type based on the model path."""
-    if model_path is None or not os.path.isfile(model_path):
-        raise ValueError("Invalid model path.")
+    if model_path is None:
+        return None
+    model_path = check_paths(model_path, plugin_path)
     
     # Try to determine model type from file extension
     file_ext = os.path.splitext(model_path)[1].lower()
@@ -137,14 +139,18 @@ def detect_state(state_config: str) -> State:
 def detect_obstruction_detector(config: str) -> ObstructionDetector:
     return None
 
-def detect_calibrator(calibration_path: str) -> Calibrator:
+def detect_calibrator(calibration_path: str, plugin_path: str) -> Calibrator:
+    if calibration_path is None:
+        return None
+    calibration_path = check_paths(calibration_path, plugin_path)
     return WebcamCalibrator(calibration_path)
     
 
-def detect_network(network_path: str) -> Network:
+def detect_network(network_path: str, plugin_path: str) -> Network:
     """Determine the network type based on the configuration path."""
-    if not os.path.isfile(network_path):
-        raise ValueError(f"Network configuration file not found: {network_path}")
+    if network_path is None:
+        return None
+    network_path = check_paths(network_path, plugin_path)
     
     try:
         with open(network_path, 'r') as f:
@@ -165,3 +171,47 @@ def detect_network(network_path: str) -> Network:
             raise ValueError(f"Unsupported network type: {network_type}")
     except json.JSONDecodeError:
         raise ValueError(f"Invalid JSON format in network configuration file: {network_path}")
+    
+    
+def check_paths(path: str, plugin_path: str) -> str:
+    """
+    Gets the path of the file.
+    Either relative to the plugin path or absolute.
+
+    Args:
+        path (str): Path to the file.
+        plugin_path (str): Path to the plugin.
+
+    Raises:
+        ValueError: If the path is invalid.
+
+    Returns:
+        str: The absolute path to the file.
+    """
+    plugin_path = os.path.join("plugins", plugin_path)
+    if os.path.isfile(path):
+        return path
+    elif os.path.isfile(os.path.join(plugin_path, path)):
+        return os.path.join(plugin_path, path)
+    else:
+        raise ValueError(f"Invalid path: {path}")
+    
+
+def inject_and_run(pipeline: Pipeline, available_components: dict):
+    """
+    Inject the components into the pipeline and run it.
+
+    Args:
+        pipeline (Pipeline): The pipeline to run.
+        available_components (dict): A dictionary of available components 
+                                    to inject into the pipeline.
+    """
+    # Determine the parameters of the pipeline's run method
+    sig = inspect.signature(pipeline.run)
+    param_names = [key for key in sig.parameters.keys() if key != "self"]
+
+    kwargs = {name: available_components[name] for name in param_names}
+
+    # Run the pipeline with the initialized components
+    pipeline.run(**kwargs)
+    

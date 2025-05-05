@@ -2,12 +2,8 @@ from makevision.core import Calibrator, Reader, Detector, Filter, ObstructionDet
 import cv2
 
 class ExamplePipeline(Pipeline):
-    def run(self, calibrator: Calibrator, 
-            reader: Reader, detector: Detector, 
-            filter: Filter, obstruction_detector: ObstructionDetector, 
-            state: State, network: Network):
-        
-        calibrator.calibrate("path/to/calibration/data")
+    def run(self, reader: Reader, detector: Detector, 
+            filter: Filter, state: State):
 
         while True:
             success, frame = reader.read()

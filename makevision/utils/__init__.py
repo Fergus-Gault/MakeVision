@@ -9,4 +9,5 @@ from .utils import (
     detect_pipeline,
     detect_calibrator,
     detect_model,
+    inject_and_run,
 )
