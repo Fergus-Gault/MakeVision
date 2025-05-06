@@ -8,7 +8,6 @@ class NumpyFileManager(FileManager):
         try:
             return np.load(path, allow_pickle=True).item()
         except (IOError, ValueError, EOFError):
-            # Return empty dict if file is empty or corrupted
             return {}
         
     def save(self, path: str, data: Data) -> None:

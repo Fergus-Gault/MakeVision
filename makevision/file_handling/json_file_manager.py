@@ -14,12 +14,12 @@ class JsonFileManager(FileManager):
             with open(path, 'r') as file:
                 data = json.load(file)
         except json.JSONDecodeError:
-            return {}  # Or raise an exception, depending on your needs
+            return {}
 
         return data
 
     def save(self, path: str, data: Data) -> None:
         """Save data to a JSON file."""
-        data_dict = data.convert()  # Use the data's convert method
+        data_dict = data.convert() 
         with open(path, 'w') as file:
             json.dump(data_dict, file, indent=4)
