@@ -1,8 +1,9 @@
 from makevision.core import Calibrator, Reader, Detector, Filter, ObstructionDetector, State, Network, Pipeline
 import cv2
 
+
 class ExamplePipeline(Pipeline):
-    def run(self, reader: Reader, detector: Detector, 
+    def run(self, reader: Reader, detector: Detector,
             filter: Filter, state: State, calibrator: Calibrator):
 
         calibrator.calibrate("./plugins/example_plugin/wide_angle_cam/")

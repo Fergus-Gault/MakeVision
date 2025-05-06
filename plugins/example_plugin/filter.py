@@ -1,6 +1,7 @@
 from makevision.core import Filter
 from collections import defaultdict
 
+
 class ExampleFilter(Filter):
     def __init__(self, model):
         self.model = model
@@ -14,7 +15,8 @@ class ExampleFilter(Filter):
             return results
 
         # Sort results by confidence (highest confidence first)
-        results = sorted(results, key=lambda result: max(result.boxes.conf) if hasattr(result.boxes, 'conf') and len(result.boxes.conf) > 0 else 0, reverse=True)
+        results = sorted(results, key=lambda result: max(result.boxes.conf) if hasattr(
+            result.boxes, 'conf') and len(result.boxes.conf) > 0 else 0, reverse=True)
 
         class_limits = {
             "white": 1,

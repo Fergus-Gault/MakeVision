@@ -1,6 +1,8 @@
-from makevision.core import FileManager, Data
 import json
+
+from makevision.core import Data, FileManager
 from makevision.core.exceptions import FileNotJsonError
+
 
 class JsonFileManager(FileManager):
     """Base class for JSON file managers."""
@@ -20,6 +22,13 @@ class JsonFileManager(FileManager):
 
     def save(self, path: str, data: Data) -> None:
         """Save data to a JSON file."""
-        data_dict = data.convert() 
-        with open(path, 'w') as file:
-            json.dump(data_dict, file, indent=4)
+        data_dict = data.convert()
+        try:
+            with open(path, 'w') as file:
+                json.dump(data_dict, file, indent=4)
+        except TypeError as e:
+            raise TypeError(f"Data cannot be serialized to JSON: {e}")
+        except IOError as e:
+            raise IOError(f"Error writing to file {path}: {e}")
+        except Exception as e:
+            raise Exception(f"An unexpected error occurred: {e}")

@@ -1,17 +1,15 @@
-from makevision.core import (Detector, Network,
-                      Pipeline, State, Calibrator,
-                      Reader, Filter, ObstructionDetector,
-                      ArucoBoardDef)
 import cv2
 
+from makevision.core import (ArucoBoardDef, Calibrator, Detector,
+                             Filter, Network, ObstructionDetector,
+                             Pipeline, Reader, State)
+
+
 class BasicPipeline(Pipeline):
-    def run(calibrator: Calibrator, reader: Reader, 
-            detector: Detector, filter: Filter, 
-            obstruction: ObstructionDetector, 
-            state: State, network: Network,
-            calibration_path: str = "./data/images/",
+    def run(calibrator: Calibrator, reader: Reader, detector: Detector,
+            filter: Filter, obstruction: ObstructionDetector, state: State,
+            network: Network, calibration_path: str = "./data/images/",
             aruco_board: ArucoBoardDef = ArucoBoardDef()) -> None:
-        
         """Run the pipeline."""
         calibrator.calibrate(calibration_path, aruco_board)
 

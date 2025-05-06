@@ -1,30 +1,33 @@
-from makevision.core import (
-    Reader,
-    Detector,
-    Network,
-    Filter,
-    ObstructionDetector,
-    State,
-    Pipeline,
-    Calibrator,
-    Model
-)
-from makevision.pipelines import BasicPipeline
-from makevision.calibration import WebcamCalibrator
-from makevision.model import YoloModel, TfModel, OnnxModel
-import os
 import inspect
-from types import ModuleType
-import importlib.util
 import json
-import inspect
+import os
+from types import ModuleType
+from typing import Tuple
+import importlib.util
+
+from makevision.calibration import WebcamCalibrator
+from makevision.core import (
+    Calibrator,
+    Detector,
+    Filter,
+    Model,
+    Network,
+    ObstructionDetector,
+    Pipeline,
+    Reader,
+    State,
+)
+from makevision.model import OnnxModel, TfModel, YoloModel
+from makevision.pipelines import BasicPipeline
+
 
 def detect_plugin_components(plugin_name: str) -> object:
     """Detects a plugin in the plugin folder based on the name."""
     plugin_path = os.path.join("plugins", plugin_name)
     if not os.path.isdir(plugin_path):
-        raise ValueError(f"Plugin {plugin_name} not found in plugins directory.")
-    
+        raise ValueError(
+            f"Plugin {plugin_name} not found in plugins directory.")
+
     plugin_components = {
         "reader": None,
         "detector": None,
@@ -35,17 +38,17 @@ def detect_plugin_components(plugin_name: str) -> object:
         "pipeline": None,
         "calibrator": None,
     }
-    
+
     for module_file in os.listdir(plugin_path):
         if not module_file.endswith(".py") or module_file == "__init__.py":
             continue
-            
+
         module_name = module_file[:-3]
         module_path = os.path.join(plugin_path, module_file)
 
         try:
             module = load_module(module_path, module_name)
-            
+
             for _, obj in inspect.getmembers(module, inspect.isclass):
                 # Check if the class inherits from any of our core types
                 if issubclass(obj, Reader) and obj != Reader:
@@ -53,9 +56,9 @@ def detect_plugin_components(plugin_name: str) -> object:
                 elif issubclass(obj, Calibrator) and obj != Calibrator:
                     plugin_components["calibrator"] = obj
                 elif issubclass(obj, Detector) and obj != Detector:
-                    plugin_components["detector"]= obj
+                    plugin_components["detector"] = obj
                 elif issubclass(obj, Network) and obj != Network:
-                    plugin_components["network"]= obj
+                    plugin_components["network"] = obj
                 elif issubclass(obj, Filter) and obj != Filter:
                     plugin_components["filter"] = obj
                 elif issubclass(obj, ObstructionDetector) and obj != ObstructionDetector:
@@ -72,35 +75,39 @@ def detect_plugin_components(plugin_name: str) -> object:
         return plugin_components
     return None
 
+
 def load_module(module_path: str, module_name: str) -> ModuleType:
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Could not load module {module_name} from {module_path}")
+        raise ImportError(
+            f"Could not load module {module_name} from {module_path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
 
-def detect_source(input_path: str, loop: bool) -> Reader:
+def detect_source(input_path: str, loop: bool) -> Tuple[bool, Reader]:
     """Determine the detector based on the input type."""
     if input_path == "webcam":
         from makevision.reader import WebcamReader
-        return WebcamReader()
+        return True, WebcamReader()
     elif os.path.isfile(input_path):
         from makevision.reader import VideoReader
-        return VideoReader(input_path, loop)
+        return False, VideoReader(input_path, loop)
     else:
-        raise ValueError("Invalid input type. Use 'webcam' or a video file path.")
-    
+        raise ValueError(
+            "Invalid input type. Use 'webcam' or a video file path.")
+
+
 def detect_model(model_path: str, plugin_path: str) -> Model:
     """Determine the model type based on the model path."""
     if model_path is None:
         return None
     model_path = check_paths(model_path, plugin_path)
-    
+
     # Try to determine model type from file extension
     file_ext = os.path.splitext(model_path)[1].lower()
-    
+
     if file_ext in ['.pt', '.pth']:  # YOLO typical extensions
         from makevision.model import YoloModel
         return YoloModel(model_path)
@@ -111,7 +118,8 @@ def detect_model(model_path: str, plugin_path: str) -> Model:
     else:
         from makevision.model import YoloModel
         return YoloModel(model_path)
-    
+
+
 def detect_detector(model: Model) -> Detector:
     """Determine the detector based on the model path."""
     if model is None or not isinstance(model, Model):
@@ -126,36 +134,41 @@ def detect_detector(model: Model) -> Detector:
     else:
         from makevision.detection import YoloDetector
         return YoloDetector(model)
-    
+
+
 def detect_pipeline(pipeline_name: str) -> Pipeline:
     return BasicPipeline()
+
 
 def detect_filter(filter_name: str) -> Filter:
     return None
 
+
 def detect_state(state_config: str) -> State:
     return None
+
 
 def detect_obstruction_detector(config: str) -> ObstructionDetector:
     return None
 
+
 def detect_calibrator(calibration_path: str, plugin_path: str) -> Calibrator:
     calibration_path = check_paths(calibration_path, plugin_path)
     return WebcamCalibrator(calibration_path)
-    
+
 
 def detect_network(network_path: str, plugin_path: str) -> Network:
     """Determine the network type based on the configuration path."""
     if network_path is None:
         return None
     network_path = check_paths(network_path, plugin_path)
-    
+
     try:
         with open(network_path, 'r') as f:
             config = json.load(f)
-            
+
         network_type = config.get("type", "").lower()
-        
+
         if network_type == "socketio":
             from makevision.network import SocketIONetwork
             return SocketIONetwork(config)
@@ -168,9 +181,10 @@ def detect_network(network_path: str, plugin_path: str) -> Network:
         else:
             raise ValueError(f"Unsupported network type: {network_type}")
     except json.JSONDecodeError:
-        raise ValueError(f"Invalid JSON format in network configuration file: {network_path}")
-    
-    
+        raise ValueError(
+            f"Invalid JSON format in network configuration file: {network_path}")
+
+
 def check_paths(path: str, plugin_path: str) -> str:
     """
     Gets the path of the file.
@@ -193,7 +207,7 @@ def check_paths(path: str, plugin_path: str) -> str:
         return os.path.join(plugin_path, path)
     else:
         raise ValueError(f"Invalid path: {path}")
-    
+
 
 def inject_and_run(pipeline: Pipeline, available_components: dict):
     """
@@ -212,4 +226,3 @@ def inject_and_run(pipeline: Pipeline, available_components: dict):
 
     # Run the pipeline with the initialized components
     pipeline.run(**kwargs)
-    

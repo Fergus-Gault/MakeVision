@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Tuple
 import numpy as np
+from typing import Tuple
+
 
 class FrameData(ABC):
     """Generic class for frame data."""
@@ -15,12 +16,19 @@ class Reader(ABC):
 
     @abstractmethod
     def read(self, *args, **kwargs) -> Tuple[bool, FrameData]:
-        """Read data from the source."""
+        """
+        Read a frame from the source.
+
+        Returns:
+            Tuple[bool, FrameData]: A tuple containing a boolean 
+            indicating success and the frame data.
+            If the read was unsuccessful, the frame data will be None.
+        """
         pass
 
     @abstractmethod
     def release(self, *args, **kwargs) -> None:
-        """Close the reader."""
+        """Release the resources used by the reader."""
         pass
 
     @abstractmethod

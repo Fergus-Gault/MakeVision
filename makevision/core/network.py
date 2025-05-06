@@ -16,7 +16,12 @@ class Network(ABC):
 
     @abstractmethod
     def send_data(self, data: Any, *args, **kwargs) -> None:
-        """Send data over the network."""
+        """
+        Send data over the network.
+
+        Args:
+            data (Any): The data to send.
+        """
         pass
 
     @abstractmethod

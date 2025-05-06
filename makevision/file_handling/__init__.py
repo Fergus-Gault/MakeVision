@@ -1,6 +1,6 @@
-from .calibration_data_file_manager import (CalibrationDataFileManager, 
-                                            CalibrationDataJsonFileManager, 
-                                            CalibrationDataYamlFileManager, 
+from .calibration_data_file_manager import (CalibrationDataFileManager,
+                                            CalibrationDataJsonFileManager,
+                                            CalibrationDataYamlFileManager,
                                             CalibrationDataNumpyFileManager)
 from .json_file_manager import JsonFileManager
 from .yaml_file_manager import YamlFileManager

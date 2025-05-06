@@ -9,5 +9,13 @@ class Model(ABC):
 
     @abstractmethod
     def load_model(self, path: str, *args, **kwargs) -> Any:
-        """Loads the model of choice."""
+        """
+        Loads the model from the specified path.
+
+        Args:
+            path (str): The path to the model file.
+
+        Returns:
+            Any: The loaded model.
+        """
         pass

@@ -1,16 +1,18 @@
-from makevision.core import Model
-from ultralytics import YOLO
 import os
 import torch
+from makevision.core import Model
+from ultralytics import YOLO
+
 
 class YoloModel(Model):
+    """Yolo model class for loading and managing YOLO models."""
+
     def __init__(self, model_path: str):
-        """Initialize the YOLO model with the given model path."""
         super().__init__(model_path)
         self.device = self.model.device
         self.labels = self.model.names
-        
-    def load_model(self, model_path: str):
+
+    def load_model(self, model_path: str) -> YOLO:
         """Load the YOLO model from the specified path."""
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found at {model_path}.")
@@ -19,4 +21,3 @@ class YoloModel(Model):
             model = YOLO(model_path, task="detect")
             model.to(device)
             return model
-

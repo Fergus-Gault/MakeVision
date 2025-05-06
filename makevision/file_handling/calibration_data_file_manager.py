@@ -1,8 +1,9 @@
 from makevision.core import CalibrationData
-from .data_file_manager import FileManagerFactory, DataFileManager
+from .data_file_manager import DataFileManager, FileManagerFactory
 from .json_file_manager import JsonFileManager
-from .yaml_file_manager import YamlFileManager
 from .numpy_file_manager import NumpyFileManager
+from .yaml_file_manager import YamlFileManager
+
 
 class CalibrationDataFileManager(DataFileManager):
     """File manager for calibration data."""
@@ -14,9 +15,11 @@ class CalibrationDataFileManager(DataFileManager):
         if not data:
             return None
         return CalibrationData(data)
-    
+
+
 class CalibrationDataJsonFileManager(CalibrationDataFileManager, JsonFileManager):
     """File manager for calibration data in JSON format."""
+
     def __init__(self, file_manager_factory: FileManagerFactory, path: str) -> None:
         super().__init__(file_manager_factory, path)
 
@@ -24,9 +27,11 @@ class CalibrationDataJsonFileManager(CalibrationDataFileManager, JsonFileManager
         if not data:
             return None
         return CalibrationData(data)
-    
+
+
 class CalibrationDataYamlFileManager(CalibrationDataFileManager, YamlFileManager):
     """File manager for calibration data in YAML format."""
+
     def __init__(self, file_manager_factory: FileManagerFactory, path: str) -> None:
         super().__init__(file_manager_factory, path)
 
@@ -34,9 +39,11 @@ class CalibrationDataYamlFileManager(CalibrationDataFileManager, YamlFileManager
         if not data:
             return None
         return CalibrationData(data)
-    
+
+
 class CalibrationDataNumpyFileManager(CalibrationDataFileManager, NumpyFileManager):
     """File manager for calibration data in Numpy format."""
+
     def __init__(self, file_manager_factory: FileManagerFactory, path: str) -> None:
         super().__init__(file_manager_factory, path)
 

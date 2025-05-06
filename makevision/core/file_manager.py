@@ -11,7 +11,12 @@ class Data(ABC):
     
     @abstractmethod
     def convert(self, *args, **kwargs) -> Dict:
-        """Converts data to a dict. Dictionary is then converted to specified format."""
+        """
+        Convert the data to a dictionary format.
+
+        Returns:
+            Dict: A dictionary representation of the data.
+        """
         pass
 
 
@@ -19,9 +24,24 @@ class FileManager(ABC):
     """Abstract base class for file managers."""
     @abstractmethod
     def save(self, path: str, data: Data, *args, **kwargs) -> None:
-        """Save data to a file."""
+        """
+        Save the data to a file.
+
+        Args:
+            path (str): The path to save the file.
+            data (Data): The data to save.
+        """
         pass
+
     @abstractmethod
     def load(self, path: str, *args, **kwargs) -> Data:
-        """Load data from a file."""
+        """
+        Load data from a file.
+
+        Args:
+            path (str): The path to the file.
+
+        Returns:
+            Data: The loaded data.
+        """
         pass

@@ -1,11 +1,14 @@
-from makevision.core import Reader, FrameData
-from makevision.core.exceptions import InvalidWebcamSourceError
 import cv2
 import numpy as np
+from typing import Tuple
+
+from makevision.core import Reader, FrameData
+from makevision.core.exceptions import InvalidWebcamSourceError
+
 
 class WebcamFrameData(FrameData):
     """Class for webcam frame data."""
-    
+
     def __init__(self, frame: np.ndarray):
         self._frame = frame
 
@@ -13,7 +16,7 @@ class WebcamFrameData(FrameData):
     def frame(self) -> np.ndarray:
         """Get the frame data."""
         return self._frame
-    
+
     @frame.setter
     def frame(self, value: np.ndarray):
         self._frame = value
@@ -28,13 +31,13 @@ class WebcamReader(Reader):
         self.cap.set(cv2.CAP_PROP_FPS, fps)
         if not self.cap.isOpened():
             raise InvalidWebcamSourceError(source)
-        
-    def read(self):
+
+    def read(self) -> Tuple[bool, WebcamFrameData]:
         """Reads a frame from the webcam."""
-        success, frame =  self.cap.read()
+        success, frame = self.cap.read()
         if not success:
             return False, None
-        
+
         return True, WebcamFrameData(frame)
 
     def release(self):

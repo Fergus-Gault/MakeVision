@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from makevision.core import FrameData
 from typing import List
+
+from makevision.core import FrameData
 
 class ObstructionDetector(ABC):
     """Abstract base class for obstruction detection algorithms."""

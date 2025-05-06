@@ -1,17 +1,30 @@
-from abc import ABC, abstractmethod
-from .json_file_manager import JsonFileManager
-from .yaml_file_manager import YamlFileManager
-from .numpy_file_manager import NumpyFileManager
-from makevision.core import FileManager, Data
-
 import os
+from abc import ABC, abstractmethod
+
+from makevision.core import FileManager, Data
+from .json_file_manager import JsonFileManager
+from .numpy_file_manager import NumpyFileManager
+from .yaml_file_manager import YamlFileManager
+
 
 class FileManagerFactory(ABC):
     @abstractmethod
     def create_file_manager(self, path: str) -> FileManager:
+        """
+        Abstract method to create a file manager based on the file extension.
+
+        Args:
+            path (str): The path to the file.
+
+        Returns:
+            FileManager: An instance of the appropriate file manager.
+        """
         pass
 
+
 class DefaultFileManagerFactory(FileManagerFactory):
+    """Factor class to create file managers based on file extension."""
+
     def create_file_manager(self, path: str) -> FileManager:
         if not path:
             return None
@@ -25,7 +38,8 @@ class DefaultFileManagerFactory(FileManagerFactory):
             return NumpyFileManager()
         else:
             raise ValueError(f"Unsupported file type: {file_extension}")
-        
+
+
 class DataFileManager(FileManager):
     """Abstract file manager for specific data types."""
 
@@ -42,6 +56,13 @@ class DataFileManager(FileManager):
 
     @abstractmethod
     def _create_data_object(self, data: dict) -> Data:
-        """Abstract method to create a Data object from a dictionary."""
+        """
+        Creates a data object from the loaded data.
+
+        Args:
+            data (dict): The loaded data.
+
+        Returns:
+            Data: An instance of the data object.
+        """
         pass
-    
