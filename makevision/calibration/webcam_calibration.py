@@ -12,10 +12,14 @@ class WebcamCalibrator(Calibrator):
         file_manager_factory = DefaultFileManagerFactory()
         self.file_manager = CalibrationDataFileManager(file_manager_factory, path)
         self.calibration_data = None
+        self.undistort_maps = None
 
     def calibrate(self, images_path: str = None, aruco_board: ArucoBoardDef = ArucoBoardDef()) -> None:
         self.calibration_data = self.file_manager.load()
         if self.calibration_data:
+            # Calculate undistort maps
+            if self.undistort_maps is None:
+                self.undistort_maps = self.calibration_data.calculate_undistort_maps()
             return
         
         if not images_path:
@@ -36,34 +40,38 @@ class WebcamCalibrator(Calibrator):
         
         h, w = img_size[:2]
         newcamera_mtx, roi = cv2.getOptimalNewCameraMatrix(camera_mtx, dist_coeffs, (w, h), 1, (w, h))
-        self.calibration_data = CalibrationData({"camera_mtx": camera_mtx, "dist_coeffs": dist_coeffs, "newcamera_mtx": newcamera_mtx, "roi": roi})
+
+        # Create CalibrationData object
+        calibration_data = {"camera_mtx": camera_mtx, 
+                            "dist_coeffs": dist_coeffs, 
+                            "newcamera_mtx": newcamera_mtx, 
+                            "roi": roi, 
+                            "img_size": (w, h)}
+        self.calibration_data = CalibrationData(calibration_data)
+
+        # Calculate undistort maps
+        self.undistort_maps = self.calibration_data.calculate_undistort_maps()
         
-        # Save the generated calibration data
-        self.file_manager.save(self.calibration_data)
+        # Attempt to save the calibration data
+        try:
+            self.file_manager.save(self.calibration_data)
+        except Exception as e:
+            print(f"Error saving calibration data: {e}")
 
 
     def undistort(self, frame: FrameData) -> FrameData:
         if frame is None or frame.frame is None or self.calibration_data is None:
             return frame
         
-        # Lazy initialization of undistortion maps
-        if not hasattr(self, '_undistort_maps'):
-            h, w = frame.frame.shape[:2]
-            self._undistort_maps = cv2.initUndistortRectifyMap(
-                self.calibration_data.camera_matrix,
-                self.calibration_data.dist_coeffs,
-                None,
-                self.calibration_data.newcamera_mtx,
-                (w, h),
-                cv2.CV_16SC2
-            )
+        if self.undistort_maps is None:
+            return frame
         
         # Use remap which is faster than undistort
         undistorted_frame = cv2.remap(
             frame.frame, 
-            self._undistort_maps[0], 
-            self._undistort_maps[1], 
-            cv2.INTER_LINEAR
+            self.undistort_maps[0], 
+            self.undistort_maps[1], 
+            cv2.INTER_LINEAR,
         )
         
         # Crop to ROI
@@ -113,4 +121,3 @@ class WebcamCalibrator(Calibrator):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         img_size = image.shape
         return images, img_size
-

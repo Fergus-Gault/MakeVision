@@ -1,30 +1,9 @@
 from makevision.core import FileManager, Data
 import json
-import numpy as np
 from makevision.core.exceptions import FileNotJsonError
-import os
 
 class JsonFileManager(FileManager):
-    def save(self, path: str, data: Data) -> None:
-        """Save data to a JSON file."""
-
-        def numpy_to_json_serializable(obj):
-            """Convert numpy arrays to lists recursively."""
-            if isinstance(obj, np.ndarray):
-                return obj.tolist()
-            elif obj is None:
-                return None
-            else:
-                return obj
-
-        # Build data dictionary dynamically from object attributes
-        data_dict = {}
-        for attr_name in vars(data):
-            attr_value = getattr(data, attr_name)
-            data_dict[attr_name] = numpy_to_json_serializable(attr_value)
-
-        with open(path, 'w') as file:
-            json.dump(data_dict, file, indent=4)
+    """Base class for JSON file managers."""
 
     def load(self, path: str) -> dict:
         """Load data from a JSON file."""
@@ -35,8 +14,12 @@ class JsonFileManager(FileManager):
             with open(path, 'r') as file:
                 data = json.load(file)
         except json.JSONDecodeError:
-            with open(path, 'w') as file:
-                data = {}
-                file.write(f"{data}")
+            return {}  # Or raise an exception, depending on your needs
 
         return data
+
+    def save(self, path: str, data: Data) -> None:
+        """Save data to a JSON file."""
+        data_dict = data.convert()  # Use the data's convert method
+        with open(path, 'w') as file:
+            json.dump(data_dict, file, indent=4)

@@ -139,9 +139,7 @@ def detect_state(state_config: str) -> State:
 def detect_obstruction_detector(config: str) -> ObstructionDetector:
     return None
 
-def detect_calibrator(calibration_path: str, plugin_path: str, calibrate: bool) -> Calibrator:
-    if calibration_path is None:
-        return WebcamCalibrator() if calibrate else None
+def detect_calibrator(calibration_path: str, plugin_path: str) -> Calibrator:
     calibration_path = check_paths(calibration_path, plugin_path)
     return WebcamCalibrator(calibration_path)
     
