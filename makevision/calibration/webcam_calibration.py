@@ -11,14 +11,14 @@ from makevision.file_handling import CalibrationDataFileManager, DefaultFileMana
 class WebcamCalibrator(Calibrator):
     """Calibrates a webcam using ChArUco boards."""
 
-    def __init__(self, path: str = None) -> None:
+    def __init__(self, path: str) -> None:
         file_manager_factory = DefaultFileManagerFactory()
         self.file_manager = CalibrationDataFileManager(
             file_manager_factory, path)
         self.calibration_data = None
         self.undistort_maps = None
 
-    def calibrate(self, images_path: str = None, aruco_board: ArucoBoardDef = ArucoBoardDef()) -> None:
+    def calibrate(self, images_path: str, aruco_board_def: ArucoBoardDef) -> None:
         self.calibration_data = self.file_manager.load()
         if self.calibration_data:
             # Calculate undistort maps
@@ -30,7 +30,7 @@ class WebcamCalibrator(Calibrator):
             raise ValueError("No images path provided for calibration.")
 
         # Define ChArUco board
-        aruco_board = self._get_aruco_board(aruco_board)
+        aruco_board = self._get_aruco_board(aruco_board_def)
 
         # Load images
         images, img_size = self._load_images(images_path)

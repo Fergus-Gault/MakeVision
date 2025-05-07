@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import List, Any
 
+
 class Filter(ABC):
     """Abstract base class for detection filtering logic."""
+
     def __init__(self, model: Any) -> None:
         self.model = model
-        
+
     @abstractmethod
     def apply(self, results: List, *args, **kwargs) -> List:
         """

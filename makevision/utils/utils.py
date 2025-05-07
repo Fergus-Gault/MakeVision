@@ -2,7 +2,7 @@ import inspect
 import json
 import os
 from types import ModuleType
-from typing import Tuple
+from typing import Tuple, Dict
 import importlib.util
 
 from makevision.calibration import WebcamCalibrator
@@ -101,8 +101,6 @@ def detect_source(input_path: str, loop: bool) -> Tuple[bool, Reader]:
 
 def detect_model(model_path: str, plugin_path: str) -> Model:
     """Determine the model type based on the model path."""
-    if model_path is None:
-        return None
     model_path = check_paths(model_path, plugin_path)
 
     # Try to determine model type from file extension
@@ -120,20 +118,18 @@ def detect_model(model_path: str, plugin_path: str) -> Model:
         return YoloModel(model_path)
 
 
-def detect_detector(model: Model) -> Detector:
+def detect_detector(model: Model, streaming: bool) -> Detector:
     """Determine the detector based on the model path."""
-    if model is None or not isinstance(model, Model):
-        raise ValueError("Invalid model.")
-    elif isinstance(model, YoloModel):
+    if isinstance(model, YoloModel):
         from makevision.detection import YoloDetector
-        return YoloDetector(model)
+        return YoloDetector(model, streaming)
     elif isinstance(model, TfModel):  # TensorFlow extensions
         raise NotImplementedError("TensorFlow model not yet supported.")
     elif isinstance(model, OnnxModel):  # ONNX format
         raise NotImplementedError("ONNX model not yet supported.")
     else:
         from makevision.detection import YoloDetector
-        return YoloDetector(model)
+        return YoloDetector(model, streaming)
 
 
 def detect_pipeline(pipeline_name: str) -> Pipeline:
@@ -159,8 +155,6 @@ def detect_calibrator(calibration_path: str, plugin_path: str) -> Calibrator:
 
 def detect_network(network_path: str, plugin_path: str) -> Network:
     """Determine the network type based on the configuration path."""
-    if network_path is None:
-        return None
     network_path = check_paths(network_path, plugin_path)
 
     try:
@@ -209,13 +203,13 @@ def check_paths(path: str, plugin_path: str) -> str:
         raise ValueError(f"Invalid path: {path}")
 
 
-def inject_and_run(pipeline: Pipeline, available_components: dict):
+def inject_and_run(pipeline: Pipeline, available_components: Dict):
     """
     Inject the components into the pipeline and run it.
 
     Args:
         pipeline (Pipeline): The pipeline to run.
-        available_components (dict): A dictionary of available components 
+        available_components (Dict): A dictionary of available components 
                                     to inject into the pipeline.
     """
     # Determine the parameters of the pipeline's run method

@@ -23,7 +23,7 @@ class WebcamFrameData(FrameData):
 
 
 class WebcamReader(Reader):
-    def __init__(self, source=0, backend=cv2.CAP_MSMF, dimensions=(1920, 1080), fps=30):
+    def __init__(self, source: int = 0, backend: int = cv2.CAP_MSMF, dimensions: Tuple[int, int] = (1920, 1080), fps: int = 30):
         self.source = source
         self.cap = cv2.VideoCapture(self.source, backend)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, dimensions[0])

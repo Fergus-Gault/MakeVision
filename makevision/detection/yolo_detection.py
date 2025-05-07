@@ -1,6 +1,7 @@
 import cv2
-from makevision.core import Detector, FrameData, Model
 from typing import List
+
+from makevision.core import Detector, FrameData, Model
 
 
 class YoloDetector(Detector):
@@ -25,7 +26,7 @@ class YoloDetector(Detector):
 
         return list(results)
 
-    def visualize(self, frame, detections):
+    def visualize(self, frame: FrameData, detections: List) -> None:
         """Visualize the detection results on the frame."""
         for result in detections:
             boxes = result.boxes.xyxy.cpu().numpy()

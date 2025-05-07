@@ -1,9 +1,10 @@
-import socketio
 from makevision.core import Network
+from typing import Dict
+import socketio
 
 
 class SocketIONetwork(Network):
-    def __init__(self, config: dict):
+    def __init__(self, config: Dict):
         self.config = config
         self.socket = None
         self.connect()
@@ -14,12 +15,12 @@ class SocketIONetwork(Network):
         self.socket = socketio.Client()
         self.socket.connect(self.config['url'])
 
-    def send_data(self, data: dict, endpoint: str):
+    def send_data(self, data: Dict, endpoint: str):
         """
         Send data over the socketio network to a specific endpoint.
 
         Args:
-            data (dict): The data to send.
+            data (Dict): The data to send.
             endpoint (str): The endpoint to send the data to.
 
         Raises:

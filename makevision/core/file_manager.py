@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict
 
+
 class Data(ABC):
     """Generic data class."""
     @property
@@ -8,7 +9,7 @@ class Data(ABC):
     def data(self) -> Any:
         """Get the data."""
         pass
-    
+
     @abstractmethod
     def convert(self, *args, **kwargs) -> Dict:
         """

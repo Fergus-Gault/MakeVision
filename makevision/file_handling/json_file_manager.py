@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 from makevision.core import Data, FileManager
 from makevision.core.exceptions import FileNotJsonError
@@ -7,7 +8,7 @@ from makevision.core.exceptions import FileNotJsonError
 class JsonFileManager(FileManager):
     """Base class for JSON file managers."""
 
-    def load(self, path: str) -> dict:
+    def load(self, path: str) -> Dict:
         """Load data from a JSON file."""
         if not path.endswith('.json'):
             raise FileNotJsonError()

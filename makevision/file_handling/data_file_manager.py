@@ -1,7 +1,8 @@
 import os
 from abc import ABC, abstractmethod
+from typing import Dict
 
-from makevision.core import FileManager, Data
+from makevision.core import Data, FileManager
 from .json_file_manager import JsonFileManager
 from .numpy_file_manager import NumpyFileManager
 from .yaml_file_manager import YamlFileManager
@@ -55,12 +56,12 @@ class DataFileManager(FileManager):
         self.file_manager.save(self.path, data)
 
     @abstractmethod
-    def _create_data_object(self, data: dict) -> Data:
+    def _create_data_object(self, data: Dict) -> Data:
         """
         Creates a data object from the loaded data.
 
         Args:
-            data (dict): The loaded data.
+            data (Dict): The loaded data.
 
         Returns:
             Data: An instance of the data object.

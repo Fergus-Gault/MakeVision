@@ -1,11 +1,13 @@
+from typing import Dict, Any
+
 import numpy as np
 
-from makevision.core import FileManager, Data
+from makevision.core import Data, FileManager
 
 
 class NumpyFileManager(FileManager):
 
-    def load(self, path: str) -> dict:
+    def load(self, path: str) -> Dict:
         """Load data from a .npy file."""
         try:
             return np.load(path, allow_pickle=True).item()

@@ -9,13 +9,15 @@ from cv2.aruco import ArucoDetector, CharucoBoard, DetectorParameters
 
 from makevision.core import Data, FrameData
 
+
 @dataclass
 class ArucoBoardDef:
     """Holds the ArUco board parameters."""
-    aruco_size: tuple = (6, 8)
+    aruco_size: Tuple = (6, 8)
     square_length: int = 34
     marker_length: int = 27
-    aruco_dict: int = aruco.DICT_4X4_50 
+    aruco_dict: int = aruco.DICT_4X4_50
+
 
 @dataclass
 class ArucoBoard:
@@ -24,13 +26,14 @@ class ArucoBoard:
     params: DetectorParameters
     detector: ArucoDetector
 
+
 class CalibrationData(Data):
     """Holds the calibration data."""
-    
+
     def __init__(self, data: Dict) -> None:
         """
         Initialize the calibration data.
-        
+
         Args:
             data (Dict): Dictionary containing calibration parameters.
         """
@@ -61,12 +64,12 @@ class CalibrationData(Data):
             "img_size": self.img_size
         }
 
-    def convert(self) -> Dict[str, Any]:
+    def convert(self) -> Dict:
         """
         Convert the calibration data to a dictionary format.
 
         Returns:
-            Dict[str, Any]: A dictionary representation of the calibration data.
+            Dict: A dictionary representation of the calibration data.
         """
         try:
             data_dict = {
@@ -78,30 +81,38 @@ class CalibrationData(Data):
             }
             return data_dict
         except Exception as e:
-            raise ValueError(f"Error converting calibration data to dictionary: {e}")
-    
-    def calculate_undistort_maps(self) -> Tuple[np.ndarray, np.ndarray]:
+            raise ValueError(
+                f"Error converting calibration data to dictionary: {e}")
+
+    def calculate_undistort_maps(self) -> Tuple:
         """
         Calculate the undistortion maps for the camera.
 
         Returns:
-            _type_: _description_
+            Tuple: A tuple containing the x and y undistortion maps.
         """
+        if (self.camera_mtx is None or self.dist_coeffs is None or
+                self.newcamera_mtx is None or self.img_size is None):
+            raise ValueError(
+                "Calibration data is incomplete. Cannot calculate undistort maps.")
+
+        R = np.eye(3)
+
         return cv2.initUndistortRectifyMap(
             self.camera_mtx,
             self.dist_coeffs,
-            None,
+            R,
             self.newcamera_mtx,
             self.img_size,
             cv2.CV_32FC1
         )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict:
         """
         Convert the calibration data to a dictionary format.
 
         Returns:
-            Dict[str, Any]: A dictionary representation of the calibration data.
+            Dict: A dictionary representation of the calibration data.
         """
         try:
             data_dict = {
@@ -113,14 +124,15 @@ class CalibrationData(Data):
             }
             return data_dict
         except Exception as e:
-            raise ValueError(f"Error converting calibration data to dictionary: {e}")
+            raise ValueError(
+                f"Error converting calibration data to dictionary: {e}")
 
-    def to_numpy(self) -> Dict[str, Any]:
+    def to_numpy(self) -> Dict:
         """
         Convert the calibration data to a numpy format.
 
         Returns:
-            Dict[str, Any]: A dictionary representation of the calibration data in numpy format.
+            Dict: A dictionary representation of the calibration data in numpy format.
         """
         try:
             data_dict = {
@@ -132,8 +144,8 @@ class CalibrationData(Data):
             }
             return data_dict
         except Exception as e:
-            raise ValueError(f"Error converting calibration data to numpy format: {e}")
-
+            raise ValueError(
+                f"Error converting calibration data to numpy format: {e}")
 
 
 class Calibrator(ABC):

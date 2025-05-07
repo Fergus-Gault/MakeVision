@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-import numpy as np
 from typing import Tuple
+
+import numpy as np
 
 
 class FrameData(ABC):
@@ -10,6 +11,7 @@ class FrameData(ABC):
     def frame(self) -> np.ndarray:
         """Get the frame data."""
         pass
+
 
 class Reader(ABC):
     """Abstract base class for reading data from a source."""
@@ -35,5 +37,3 @@ class Reader(ABC):
     def reset(self, *args, **kwargs) -> None:
         """Reset the reader."""
         pass
-
-    

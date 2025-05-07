@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class Pipeline(ABC):
     """Abstract base class for program pipelines."""
     @abstractmethod

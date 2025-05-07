@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
+
+
 class State(ABC):
     """Abstract base class for the state of the program."""
     @abstractmethod

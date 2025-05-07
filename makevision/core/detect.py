@@ -4,8 +4,10 @@ from typing import List
 from .model import Model
 from .reader import FrameData
 
+
 class Detector(ABC):
     """Abstract base class for detectors."""
+
     def __init__(self, model: Model, streaming: bool) -> None:
         """
         Initialize the detector with a model.

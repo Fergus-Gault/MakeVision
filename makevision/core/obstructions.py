@@ -3,6 +3,7 @@ from typing import List
 
 from makevision.core import FrameData
 
+
 class ObstructionDetector(ABC):
     """Abstract base class for obstruction detection algorithms."""
 

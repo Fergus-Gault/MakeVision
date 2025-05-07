@@ -6,7 +6,7 @@ from makevision.core import (ArucoBoardDef, Calibrator, Detector,
 
 
 class BasicPipeline(Pipeline):
-    def run(calibrator: Calibrator, reader: Reader, detector: Detector,
+    def run(self, calibrator: Calibrator, reader: Reader, detector: Detector,
             filter: Filter, obstruction: ObstructionDetector, state: State,
             network: Network, calibration_path: str = "./data/images/",
             aruco_board: ArucoBoardDef = ArucoBoardDef()) -> None:

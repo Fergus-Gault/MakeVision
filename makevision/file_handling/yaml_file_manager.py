@@ -1,12 +1,13 @@
 import os
 import yaml
+from typing import Any, Dict
 
 from makevision.core import Data, FileManager
 from makevision.core.exceptions import FileNotYamlError
 
 
 class YamlFileManager(FileManager):
-    def load(self, path: str) -> dict:
+    def load(self, path: str) -> Dict:
         """Load data from a YAML file."""
         if not path.endswith(('.yaml', '.yml')):
             raise FileNotYamlError()

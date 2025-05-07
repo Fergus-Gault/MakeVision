@@ -1,4 +1,4 @@
-from makevision.core import Calibrator, Reader, Detector, Filter, ObstructionDetector, State, Network, Pipeline
+from makevision.core import Calibrator, Reader, Detector, Filter, State, Pipeline, ArucoBoardDef
 import cv2
 
 
@@ -6,7 +6,8 @@ class ExamplePipeline(Pipeline):
     def run(self, reader: Reader, detector: Detector,
             filter: Filter, state: State, calibrator: Calibrator):
 
-        calibrator.calibrate("./plugins/example_plugin/wide_angle_cam/")
+        calibrator.calibrate(
+            "./plugins/example_plugin/wide_angle_cam/", aruco_board_def=ArucoBoardDef())
 
         while True:
             success, frame = reader.read()
