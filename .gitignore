@@ -1,5 +1,7 @@
 env/
 __pycache__/
-plugins/*
-!plugins/*.py
+*.mp4
+*.json
+*.npy
+*.jpg
 .vscode/
