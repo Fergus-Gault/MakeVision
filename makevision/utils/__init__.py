@@ -11,3 +11,4 @@ from .utils import (
     detect_model,
     inject_and_run,
 )
+from .timer import Timer

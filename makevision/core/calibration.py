@@ -87,6 +87,11 @@ class CalibrationData(Data):
     def calculate_undistort_maps(self) -> Tuple:
         """
         Calculate the undistortion maps for the camera.
+        This crops the image to the ROI obtained from calibration
+        and generates the undistortion maps.
+
+        This is more efficient than generating maps for the entire image.
+        The maps are used for remapping the image to undistort it.
 
         Returns:
             Tuple: A tuple containing the x and y undistortion maps.
@@ -98,14 +103,26 @@ class CalibrationData(Data):
 
         R = np.eye(3)
 
-        return cv2.initUndistortRectifyMap(
+        # Extract ROI coordinates
+        x, y, w, h = self.roi
+
+        # Create a specialized camera matrix for the ROI
+        roi_camera_mtx = self.newcamera_mtx.copy()
+        # Adjust the principal point (cx, cy) to account for the ROI offset
+        roi_camera_mtx[0, 2] = roi_camera_mtx[0, 2] - x
+        roi_camera_mtx[1, 2] = roi_camera_mtx[1, 2] - y
+
+        # Generate maps only for the ROI region
+        maps = cv2.initUndistortRectifyMap(
             self.camera_mtx,
             self.dist_coeffs,
             R,
-            self.newcamera_mtx,
-            self.img_size,
-            cv2.CV_32FC1
+            roi_camera_mtx,
+            (w, h),  # Only map the ROI size
+            cv2.CV_16SC2
         )
+
+        return maps
 
     def to_dict(self) -> Dict:
         """

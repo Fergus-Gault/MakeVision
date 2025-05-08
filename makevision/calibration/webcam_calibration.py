@@ -21,9 +21,7 @@ class WebcamCalibrator(Calibrator):
     def calibrate(self, images_path: str, aruco_board_def: ArucoBoardDef) -> None:
         self.calibration_data = self.file_manager.load()
         if self.calibration_data:
-            # Calculate undistort maps
-            if self.undistort_maps is None:
-                self.undistort_maps = self.calibration_data.calculate_undistort_maps()
+            self.undistort_maps = self.calibration_data.calculate_undistort_maps()
             return
 
         if not images_path:
@@ -66,7 +64,7 @@ class WebcamCalibrator(Calibrator):
                 self.calibration_data is None or self.undistort_maps is None:
             return frame
 
-        # Remap the image using the undistort maps
+        # Remap using ROI optimized maps
         undistorted_frame = cv2.remap(
             frame.frame,
             self.undistort_maps[0],
@@ -74,9 +72,7 @@ class WebcamCalibrator(Calibrator):
             cv2.INTER_LINEAR,
         )
 
-        # Crop to ROI
-        x, y, w, h = self.calibration_data.roi
-        frame.frame = undistorted_frame[y:y+h, x:x+w]
+        frame.frame = undistorted_frame
 
         return frame
 

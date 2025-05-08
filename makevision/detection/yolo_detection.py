@@ -2,6 +2,7 @@ import cv2
 from typing import List
 
 from makevision.core import Detector, FrameData, Model
+import numpy as np
 
 
 class YoloDetector(Detector):
@@ -14,30 +15,35 @@ class YoloDetector(Detector):
     def detect(self, frame: FrameData) -> List:
         """Detect objects in the given frame using the YOLO model."""
 
+        # Optimize for inference speed in video processing
         results = self.model(
-            frame.frame,                # FrameData object containing the frame
-            verbose=False,              # Suppress verbose output
-            conf=0.5,                   # Confidence threshold for detections
-            iou=0.4,                    # IOU threshold for non-max suppression
-            device=self.model.device,   # Use GPU if available (0), or 'cpu'
-            half=self.use_half,         # Use FP16 half-precision inference
-            stream=self.streaming,      # Enable streaming mode for real-time processing
+            frame.frame,                        # FrameData object containing the frame
+            verbose=False,                      # Suppress verbose output
+            conf=0.50,                          # Lower confidence threshold for faster processing
+            iou=0.45,                           # Adjusted IOU threshold
+            # Use GPU if available (0), or 'cpu'
+            device=self.model.device,
+            half=self.use_half,                 # Use FP16 half-precision inference
+            stream=self.streaming,              # Enable streaming mode for real-time processing
+            imgsz=640,                          # Resize images to 640x640 for faster processing
+            stream_buffer=not self.streaming,   # Buffer for streaming mode
         )
 
-        return list(results)
+        return results
 
     def visualize(self, frame: FrameData, detections: List) -> None:
         """Visualize the detection results on the frame."""
         for result in detections:
-            boxes = result.boxes.xyxy.cpu().numpy()
+            boxes = result.boxes.xyxy.cpu().numpy().astype(np.int32)
             confidences = result.boxes.conf.cpu().numpy()
-            class_ids = result.boxes.cls.cpu().numpy()
+            class_ids = result.boxes.cls.cpu().numpy().astype(np.int32)
 
-            for box, conf, cls in zip(boxes, confidences, class_ids):
-                x1, y1, x2, y2 = map(int, box)
-                label = f"Class {self._model.labels[int(cls)]}: {conf:.2f}"
+            for _, (box, conf, cls_id) in enumerate(zip(boxes, confidences, class_ids)):
+                x1, y1, x2, y2 = box
+                label = f"{self._model.labels[cls_id]}: {conf:.2f}"
+
                 cv2.rectangle(frame.frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame.frame, label, (x1, y1 - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
         cv2.imshow("Detection", frame.frame)
