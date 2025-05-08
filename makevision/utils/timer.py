@@ -1,6 +1,9 @@
 import time
 from collections import defaultdict
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Timer:
@@ -26,7 +29,8 @@ class Timer:
         if self.name:
             if self.accumulate:
                 Timer._timings[self.name].append(elapsed)
-            # TODO: Log time
+            logger.info(
+                f"Timer '{self.name}' elapsed time: {elapsed:.4f} seconds")
         return elapsed
 
     @classmethod
@@ -35,4 +39,5 @@ class Timer:
             total_time = sum(records)
             count = len(records)
             avg = total_time / count if count > 0 else 0
-            # TODO: Log summary
+            logger.info(
+                f"Timer '{name}' - Total: {total_time:.4f} seconds, Count: {count}, Average: {avg:.4f} seconds")

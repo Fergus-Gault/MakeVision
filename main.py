@@ -1,6 +1,7 @@
 from makevision.utils import *
 
 import argparse
+import logging
 
 
 def main():
@@ -10,9 +11,14 @@ def main():
     It will check any arguments provided by the user and use those.
     If arguments are not provided, it will check the plugin for the modules.
     """
+
+    # Set up logging
+    logging.getLogger('makevision').addHandler(logging.NullHandler())
+
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Run the basic pipeline.")
-    parser.add_argument("input", help="Type of input (webcam or video file).")
+    parser.add_argument("--input", required=False,
+                        help="Type of input (webcam or video file).")
     parser.add_argument("--loop", action="store_true",
                         help="Loop the video input.")
     parser.add_argument("--plugin", required=True,
@@ -39,8 +45,9 @@ def main():
     plugin_components = detect_plugin_components(args.plugin)
 
     # Initialize components based on provided arguments first, then from plugin if not provided
-    streaming, reader = detect_source(
-        args.input, args.loop) if args.input else plugin_components["reader"]()
+    streaming, reader = detect_source(args.input, args.loop) if args.input else \
+        plugin_components["reader"](
+    ) if plugin_components["reader"] else (False, None)
 
     calibrator = detect_calibrator(args.calibration_data, args.plugin) \
         if args.calibration_data else \

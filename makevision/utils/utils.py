@@ -4,6 +4,7 @@ import os
 from types import ModuleType
 from typing import Tuple, Dict
 import importlib.util
+import logging
 
 from makevision.calibration import WebcamCalibrator
 from makevision.core import (
@@ -19,6 +20,8 @@ from makevision.core import (
 )
 from makevision.model import OnnxModel, TfModel, YoloModel
 from makevision.pipelines import BasicPipeline
+
+logger = logging.getLogger(__name__)
 
 
 def detect_plugin_components(plugin_name: str) -> object:
@@ -68,7 +71,7 @@ def detect_plugin_components(plugin_name: str) -> object:
                 elif issubclass(obj, Pipeline) and obj != Pipeline:
                     plugin_components["pipeline"] = obj
         except (ImportError, AttributeError) as e:
-            print(f"Warning: Could not analyze module {module_name}: {e}")
+            logger.error(f"Could not analyze module {module_name}: {e}")
 
     # If we found components, return the plugin_components dictionary
     if any(component for component in plugin_components.values()):
