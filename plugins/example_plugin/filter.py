@@ -11,7 +11,7 @@ class ExampleFilter(Filter):
         filtered_results = []
         counts = defaultdict(int)
 
-        if results is None or len(results) == 0 or results[0].boxes is None:
+        if results is None or len(results) == 0 or len(results[0].boxes) == 0:
             return results
 
         # Sort results by confidence (highest confidence first)
