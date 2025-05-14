@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from .model import Model
 from .reader import FrameData
@@ -8,7 +8,7 @@ from .reader import FrameData
 class Detector(ABC):
     """Abstract base class for detectors."""
 
-    def __init__(self, model: Model, streaming: bool) -> None:
+    def __init__(self, model: Model, streaming: Optional[bool]) -> None:
         """
         Initialize the detector with a model.
         Args:
@@ -30,7 +30,7 @@ class Detector(ABC):
         pass
 
     @abstractmethod
-    def visualize(self, frame: FrameData, results: List, *args, **kwargs) -> None:
+    def visualize(self, frame: FrameData, results: Optional[List], *args, **kwargs) -> None:
         """
         Visualize the detection results.
         Args:

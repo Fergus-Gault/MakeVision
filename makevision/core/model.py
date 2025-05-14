@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Optional
 
 
 class Model(ABC):
@@ -10,7 +10,7 @@ class Model(ABC):
         self.model = self.load_model(model_path)
 
     @abstractmethod
-    def load_model(self, path: str, *args, **kwargs) -> Any:
+    def load_model(self, path: Optional[str], *args, **kwargs) -> Any:
         """
         Loads the model from the specified path.
 

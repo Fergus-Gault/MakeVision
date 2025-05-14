@@ -44,10 +44,11 @@ def main():
     # If not found, check other arguments for remaining modules.
     plugin_components = detect_plugin_components(args.plugin)
 
-    # Initialize components based on provided arguments first, then from plugin if not provided
-    streaming, reader = detect_source(args.input, args.loop) if args.input else \
-        plugin_components["reader"](
-    ) if plugin_components["reader"] else (False, None)
+    # Detect the source or assume user defines within pipeline
+    if args.input:
+        streaming, reader = detect_source(args.input, args.loop)
+    else:
+        streaming, reader = False, None
 
     calibrator = detect_calibrator(args.calibration_data, args.plugin) \
         if args.calibration_data else \
@@ -55,10 +56,17 @@ def main():
     ) if plugin_components["calibrator"] else None
 
     # For model and detector
-    model = detect_model(args.model, args.plugin) if args.model else None
-    detector = detect_detector(model, streaming) if args.model else \
-        plugin_components["detector"](
-            model, streaming) if plugin_components["detector"] else None
+    if args.model:
+        model = detect_model(args.model, args.plugin)
+    else:
+        model = None
+
+    if args.model:
+        detector = detect_detector(model, streaming)
+    elif plugin_components["detector"] and model:
+        detector = plugin_components["detector"](model, streaming)
+    else:
+        detector = None
 
     network = detect_network(args.network, args.plugin) if args.network else \
         plugin_components["network"](
@@ -81,8 +89,9 @@ def main():
         plugin_components["pipeline"](
     ) if plugin_components["pipeline"] else None
 
-    # Inject dependencies and run the pipeline
-    inject_and_run(pipeline, {
+    # Build components dictionary with non-None items
+    components = {
+        "pipeline": pipeline,
         "reader": reader,
         "calibrator": calibrator,
         "detector": detector,
@@ -90,7 +99,12 @@ def main():
         "filter": filter,
         "obstruction_detector": obstruction_detector,
         "state": state
-    })
+    }
+    # Remove None values
+    components = {k: v for k, v in components.items() if v is not None}
+
+    # Inject dependencies and run the pipeline
+    inject_and_run(pipeline, components)
 
 
 if __name__ == "__main__":

@@ -40,6 +40,7 @@ def detect_plugin_components(plugin_name: str) -> object:
         "state": None,
         "pipeline": None,
         "calibrator": None,
+        "model": None,
     }
 
     for module_file in os.listdir(plugin_path):
@@ -53,11 +54,13 @@ def detect_plugin_components(plugin_name: str) -> object:
             module = load_module(module_path, module_name)
 
             for _, obj in inspect.getmembers(module, inspect.isclass):
-                # Check if the class inherits from any of our core types
+                # Check if the class inherits from any of the core types
                 if issubclass(obj, Reader) and obj != Reader:
                     plugin_components["reader"] = obj
                 elif issubclass(obj, Calibrator) and obj != Calibrator:
                     plugin_components["calibrator"] = obj
+                elif issubclass(obj, Model) and obj != Model:
+                    plugin_components["model"] = obj
                 elif issubclass(obj, Detector) and obj != Detector:
                     plugin_components["detector"] = obj
                 elif issubclass(obj, Network) and obj != Network:
@@ -73,7 +76,7 @@ def detect_plugin_components(plugin_name: str) -> object:
         except (ImportError, AttributeError) as e:
             logger.error(f"Could not analyze module {module_name}: {e}")
 
-    # If we found components, return the plugin_components dictionary
+    # If components found, return the plugin_components dictionary
     if any(component for component in plugin_components.values()):
         return plugin_components
     return None
@@ -94,12 +97,14 @@ def detect_source(input_path: str, loop: bool) -> Tuple[bool, Reader]:
     if input_path == "webcam":
         from makevision.reader import WebcamReader
         return True, WebcamReader()
-    elif os.path.isfile(input_path):
+    elif os.path.isfile(input_path) and input_path.lower().endswith(('.jpg', '.jpeg', '.png')):
+        from makevision.reader import ImageReader
+        return False, ImageReader(input_path)
+    elif os.path.isfile(input_path) and input_path.lower().endswith(('.mp4', '.avi', '.mov')):
         from makevision.reader import VideoReader
         return False, VideoReader(input_path, loop)
     else:
-        raise ValueError(
-            "Invalid input type. Use 'webcam' or a video file path.")
+        return False, None
 
 
 def detect_model(model_path: str, plugin_path: str) -> Model:
@@ -117,8 +122,7 @@ def detect_model(model_path: str, plugin_path: str) -> Model:
     elif file_ext in ['.onnx']:  # ONNX format
         raise NotImplementedError("ONNX model not yet supported.")
     else:
-        from makevision.model import YoloModel
-        return YoloModel(model_path)
+        return None
 
 
 def detect_detector(model: Model, streaming: bool) -> Detector:
@@ -131,8 +135,7 @@ def detect_detector(model: Model, streaming: bool) -> Detector:
     elif isinstance(model, OnnxModel):  # ONNX format
         raise NotImplementedError("ONNX model not yet supported.")
     else:
-        from makevision.detection import YoloDetector
-        return YoloDetector(model, streaming)
+        return None
 
 
 def detect_pipeline(pipeline_name: str) -> Pipeline:
@@ -197,6 +200,9 @@ def check_paths(path: str, plugin_path: str) -> str:
     Returns:
         str: The absolute path to the file.
     """
+    if path is None:
+        return None
+
     plugin_path = os.path.join("plugins", plugin_path)
     if os.path.isfile(path):
         return path
@@ -219,7 +225,17 @@ def inject_and_run(pipeline: Pipeline, available_components: Dict):
     sig = inspect.signature(pipeline.run)
     param_names = [key for key in sig.parameters.keys() if key != "self"]
 
-    kwargs = {name: available_components[name] for name in param_names}
+    kwargs = {}
+
+    for param_name in param_names:
+        param = sig.parameters[param_name]
+
+        if param_name in available_components:
+            kwargs[param_name] = available_components[param_name]
+
+        elif param.default is param.empty:
+            raise ValueError(
+                f"Missing required parameter '{param_name}' for pipeline run method.")
 
     # Run the pipeline with the initialized components
     pipeline.run(**kwargs)
