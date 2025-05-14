@@ -29,8 +29,9 @@ class Timer:
         if self.name:
             if self.accumulate:
                 Timer._timings[self.name].append(elapsed)
-            logger.info(
-                f"Timer '{self.name}' elapsed time: {elapsed:.4f} seconds")
+            else:
+                logger.info(
+                    f"Timer '{self.name}' elapsed time: {elapsed:.4f} seconds")
         return elapsed
 
     @classmethod
