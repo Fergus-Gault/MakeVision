@@ -25,10 +25,14 @@ class ImageFrameData(FrameData):
 class ImageReader(Reader):
     """Image reader class for reading image files."""
 
-    def read(self, image_file: str) -> Tuple[bool, ImageFrameData]:
+    def __init__(self, image_file: str, frame_type: FrameData = ImageFrameData) -> None:
+        self.image_file = image_file
+        self.frame_type = frame_type
+
+    def read(self) -> Tuple[bool, FrameData]:
         """Read an image from the file."""
-        frame = cv2.imread(image_file)
-        return True, ImageFrameData(frame)
+        frame = cv2.imread(self.image_file)
+        return True, self.frame_type(frame)
 
     def release(self) -> None:
         pass
