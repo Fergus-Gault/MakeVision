@@ -4,7 +4,7 @@ import argparse
 import logging
 
 
-def main():
+def start():
     """
     This is the main function, the entry point for the program.
     It sets up the argument parser and runs the pipeline.
@@ -21,8 +21,6 @@ def main():
                         help="Type of input (webcam or video file).")
     parser.add_argument("--loop", action="store_true",
                         help="Loop the video input.")
-    parser.add_argument("--plugin", required=True,
-                        help="Specify the plugin to use.")
     parser.add_argument("--pipeline", required=False,
                         help="Specify the pipeline to use.")
     parser.add_argument("--calibration-data", required=False,
@@ -42,7 +40,7 @@ def main():
 
     # Check what modules are within the plugin, use them.
     # If not found, check other arguments for remaining modules.
-    plugin_components = detect_plugin_components(args.plugin)
+    pipeline = detect_pipeline()
 
     # Detect the source or assume user defines within pipeline
     if args.input:
@@ -50,44 +48,28 @@ def main():
     else:
         streaming, reader = False, None
 
-    calibrator = detect_calibrator(args.calibration_data, args.plugin) \
-        if args.calibration_data else \
-        plugin_components["calibrator"](
-    ) if plugin_components["calibrator"] else None
+    calibrator = detect_calibrator(args.calibration_data) \
+        if args.calibration_data else None
 
     # For model and detector
     if args.model:
-        model = detect_model(args.model, args.plugin)
+        model = detect_model(args.model)
     else:
         model = None
 
     if args.model:
         detector = detect_detector(model, streaming)
-    elif plugin_components["detector"] and model:
-        detector = plugin_components["detector"](model, streaming)
     else:
         detector = None
 
-    network = detect_network(args.network, args.plugin) if args.network else \
-        plugin_components["network"](
-    ) if plugin_components["network"] else None
+    network = detect_network(args.network) if args.network else None
 
-    filter = detect_filter(args.filter) if args.filter else \
-        plugin_components["filter"](
-            model) if plugin_components["filter"] else None
+    filter = detect_filter(args.filter) if args.filter else None
 
     obstruction_detector = detect_obstruction_detector(args.obstruction_detector) \
-        if args.obstruction_detector else \
-        plugin_components["obstruction_detector"](
-    ) if plugin_components["obstruction_detector"] else None
+        if args.obstruction_detector else None
 
-    state = detect_state(args.state) if args.state else \
-        plugin_components["state"]() if plugin_components["state"] else None
-
-    # Get the pipeline
-    pipeline = detect_pipeline(args.pipeline) if args.pipeline else \
-        plugin_components["pipeline"](
-    ) if plugin_components["pipeline"] else None
+    state = detect_state(args.state) if args.state else None
 
     # Build components dictionary with non-None items
     components = {
@@ -105,7 +87,3 @@ def main():
 
     # Inject dependencies and run the pipeline
     inject_and_run(pipeline, components)
-
-
-if __name__ == "__main__":
-    main()

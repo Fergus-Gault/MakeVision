@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>= 77.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "makevision"
+version = "0.0.1-beta"
+authors = [
+    { name = "Fergus Gault", email = "gaultfergus@gmail.com"}
+]
+description = "MakeVision is a flexible, modular computer vision framework designed to simplify the development of vision-based applications. It provides a structured approach to common computer vision tasks by abstracting away boilerplate code and providing a plugin architecture for extending functionality."
+readme = "README.md"
+license = "GPL-2.0"
+requires-python = ">=3.8"
+dependencies = [
+    "numpy",
+    "opencv-contrib-python",
+    "pyyaml",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include=["makevision*"]
+
+[project.urls]
+Homepage = "https://github.com/Fergus-Gault/MakeVision"

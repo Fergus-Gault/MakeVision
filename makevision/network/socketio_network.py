@@ -1,6 +1,5 @@
 from makevision.core import Network
 from typing import Dict
-import socketio
 
 
 class SocketIONetwork(Network):
@@ -12,6 +11,7 @@ class SocketIONetwork(Network):
 
     def connect(self):
         """Establish a connection to the Socket.IO server."""
+        import socketio
         self.socket = socketio.Client()
         self.socket.connect(self.config['url'])
 

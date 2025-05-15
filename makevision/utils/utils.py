@@ -19,66 +19,26 @@ from makevision.core import (
     State,
 )
 from makevision.model import OnnxModel, TfModel, YoloModel
-from makevision.pipelines import BasicPipeline
 
 logger = logging.getLogger(__name__)
 
 
-def detect_plugin_components(plugin_name: str) -> object:
-    """Detects a plugin in the plugin folder based on the name."""
-    plugin_path = os.path.join("plugins", plugin_name)
-    if not os.path.isdir(plugin_path):
-        raise ValueError(
-            f"Plugin {plugin_name} not found in plugins directory.")
+def detect_pipeline() -> Pipeline:
+    """
+    Detects and returns the first Pipeline subclass found in the current directory.
 
-    plugin_components = {
-        "reader": None,
-        "detector": None,
-        "network": None,
-        "filter": None,
-        "obstruction_detector": None,
-        "state": None,
-        "pipeline": None,
-        "calibrator": None,
-        "model": None,
-    }
-
-    for module_file in os.listdir(plugin_path):
-        if not module_file.endswith(".py") or module_file == "__init__.py":
-            continue
-
-        module_name = module_file[:-3]
-        module_path = os.path.join(plugin_path, module_file)
-
+    Returns:
+        Pipeline: The first found Pipeline subclass, or None if none found.
+    """
+    for module_file in [f for f in os.listdir(os.getcwd()) if f.endswith('.py') and f != '__init__.py']:
         try:
-            module = load_module(module_path, module_name)
-
+            module = load_module(module_file, module_file[:-3])
             for _, obj in inspect.getmembers(module, inspect.isclass):
-                # Check if the class inherits from any of the core types
-                if issubclass(obj, Reader) and obj != Reader:
-                    plugin_components["reader"] = obj
-                elif issubclass(obj, Calibrator) and obj != Calibrator:
-                    plugin_components["calibrator"] = obj
-                elif issubclass(obj, Model) and obj != Model:
-                    plugin_components["model"] = obj
-                elif issubclass(obj, Detector) and obj != Detector:
-                    plugin_components["detector"] = obj
-                elif issubclass(obj, Network) and obj != Network:
-                    plugin_components["network"] = obj
-                elif issubclass(obj, Filter) and obj != Filter:
-                    plugin_components["filter"] = obj
-                elif issubclass(obj, ObstructionDetector) and obj != ObstructionDetector:
-                    plugin_components["obstruction_detector"] = obj
-                elif issubclass(obj, State) and obj != State:
-                    plugin_components["state"] = obj
-                elif issubclass(obj, Pipeline) and obj != Pipeline:
-                    plugin_components["pipeline"] = obj
-        except (ImportError, AttributeError) as e:
-            logger.error(f"Could not analyze module {module_name}: {e}")
+                if issubclass(obj, Pipeline) and obj != Pipeline:
+                    return obj()
+        except Exception as e:
+            logger.error(f"Error analyzing module {module_file}: {e}")
 
-    # If components found, return the plugin_components dictionary
-    if any(component for component in plugin_components.values()):
-        return plugin_components
     return None
 
 
@@ -107,9 +67,8 @@ def detect_source(input_path: str, loop: bool) -> Tuple[bool, Reader]:
         return False, None
 
 
-def detect_model(model_path: str, plugin_path: str) -> Model:
+def detect_model(model_path: str) -> Model:
     """Determine the model type based on the model path."""
-    model_path = check_paths(model_path, plugin_path)
 
     # Try to determine model type from file extension
     file_ext = os.path.splitext(model_path)[1].lower()
@@ -138,10 +97,6 @@ def detect_detector(model: Model, streaming: bool) -> Detector:
         return None
 
 
-def detect_pipeline(pipeline_name: str) -> Pipeline:
-    return BasicPipeline()
-
-
 def detect_filter(filter_name: str) -> Filter:
     return None
 
@@ -154,14 +109,12 @@ def detect_obstruction_detector(config: str) -> ObstructionDetector:
     return None
 
 
-def detect_calibrator(calibration_path: str, plugin_path: str) -> Calibrator:
-    calibration_path = check_paths(calibration_path, plugin_path)
+def detect_calibrator(calibration_path: str) -> Calibrator:
     return WebcamCalibrator(calibration_path)
 
 
-def detect_network(network_path: str, plugin_path: str) -> Network:
+def detect_network(network_path: str) -> Network:
     """Determine the network type based on the configuration path."""
-    network_path = check_paths(network_path, plugin_path)
 
     try:
         with open(network_path, 'r') as f:
@@ -183,33 +136,6 @@ def detect_network(network_path: str, plugin_path: str) -> Network:
     except json.JSONDecodeError:
         raise ValueError(
             f"Invalid JSON format in network configuration file: {network_path}")
-
-
-def check_paths(path: str, plugin_path: str) -> str:
-    """
-    Gets the path of the file.
-    Either relative to the plugin path or absolute.
-
-    Args:
-        path (str): Path to the file.
-        plugin_path (str): Path to the plugin.
-
-    Raises:
-        ValueError: If the path is invalid.
-
-    Returns:
-        str: The absolute path to the file.
-    """
-    if path is None:
-        return None
-
-    plugin_path = os.path.join("plugins", plugin_path)
-    if os.path.isfile(path):
-        return path
-    elif os.path.isfile(os.path.join(plugin_path, path)):
-        return os.path.join(plugin_path, path)
-    else:
-        raise ValueError(f"Invalid path: {path}")
 
 
 def inject_and_run(pipeline: Pipeline, available_components: Dict):

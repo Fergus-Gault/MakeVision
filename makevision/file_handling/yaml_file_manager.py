@@ -1,6 +1,6 @@
 import os
 import yaml
-from typing import Any, Dict
+from typing import Dict
 
 from makevision.core import Data, FileManager
 from makevision.core.exceptions import FileNotYamlError

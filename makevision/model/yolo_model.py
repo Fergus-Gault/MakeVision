@@ -1,7 +1,5 @@
 import os
-import torch
 from makevision.core import Model
-from ultralytics import YOLO
 
 
 class YoloModel(Model):
@@ -12,8 +10,11 @@ class YoloModel(Model):
         self.device = self.model.device
         self.labels = self.model.names
 
-    def load_model(self, model_path: str, task: str = "detect") -> YOLO:
+    def load_model(self, model_path: str, task: str = "detect"):
         """Load the YOLO model from the specified path."""
+        from ultralytics import YOLO
+        import torch
+
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model file not found at {model_path}.")
         else:

@@ -1,5 +1,4 @@
 from .utils import (
-    detect_plugin_components,
     detect_source,
     detect_detector,
     detect_network,

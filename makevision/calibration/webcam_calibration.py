@@ -18,7 +18,7 @@ class WebcamCalibrator(Calibrator):
         self.calibration_data = None
         self.undistort_maps = None
 
-    def calibrate(self, images_path: str, aruco_board_def: ArucoBoardDef) -> None:
+    def calibrate(self, images_path: str, aruco_board_def: ArucoBoardDef = ArucoBoardDef()) -> None:
         self.calibration_data = self.file_manager.load()
         if self.calibration_data:
             self.undistort_maps = self.calibration_data.calculate_undistort_maps()
