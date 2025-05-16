@@ -1,15 +1,17 @@
 import inspect
-import json
-import os
-from types import ModuleType
-from typing import Tuple, Dict
 import importlib.util
+import json
 import logging
+import os
+import sys
+from types import ModuleType
+from typing import Dict, Tuple
 
 from makevision.calibration import WebcamCalibrator
 from makevision.core import (
     Calibrator,
     Detector,
+    exceptions,
     Filter,
     Model,
     Network,
@@ -30,16 +32,25 @@ def detect_pipeline() -> Pipeline:
     Returns:
         Pipeline: The first found Pipeline subclass, or None if none found.
     """
-    for module_file in [f for f in os.listdir(os.getcwd()) if f.endswith('.py') and f != '__init__.py']:
+    # Get the main script file that was executed
+    main_module = sys.modules['__main__']
+    main_file = getattr(main_module, '__file__', None)
+
+    if main_file:
         try:
-            module = load_module(module_file, module_file[:-3])
+            module_name = os.path.basename(
+                main_file)[:-3]  # Remove .py extension
+            module = load_module(main_file, module_name)
+
             for _, obj in inspect.getmembers(module, inspect.isclass):
                 if issubclass(obj, Pipeline) and obj != Pipeline:
                     return obj()
-        except Exception as e:
-            logger.error(f"Error analyzing module {module_file}: {e}")
 
-    return None
+        except Exception as e:
+            logger.error(f"Error analyzing main module {main_file}: {e}")
+
+    raise exceptions.PipelineError(
+        "No Pipeline class was found in the main script file.")
 
 
 def load_module(module_path: str, module_name: str) -> ModuleType:
