@@ -1,4 +1,4 @@
-from makevision.core import Pipeline, Reader, Detector
+from makevision import Pipeline, Reader, Detector
 import cv2
 
 # Usage:

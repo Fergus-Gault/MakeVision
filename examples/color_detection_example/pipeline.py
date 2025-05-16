@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from makevision.core import Pipeline
+from makevision import Pipeline
 from makevision.detection import ColorDetector
 from makevision.model import ColorModel
 from makevision.reader import VideoReader

@@ -1,8 +1,7 @@
 import cv2
 import logging
 
-import makevision
-from makevision.core import Calibrator, Detector, Pipeline, Reader
+from makevision import Calibrator, Detector, Pipeline, Reader
 
 
 # Usage example:
