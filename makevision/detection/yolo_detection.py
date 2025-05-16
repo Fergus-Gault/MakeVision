@@ -1,5 +1,5 @@
 import cv2
-from typing import List
+from typing import List, Any
 
 from makevision.core import Detector, FrameData, Model
 import numpy as np
@@ -39,6 +39,10 @@ class YoloDetector(Detector):
             confidences = result.boxes.conf.cpu().numpy()
             class_ids = result.boxes.cls.cpu().numpy().astype(np.int32)
 
+            # Visualise keypoints if available
+            if hasattr(result, 'keypoints') and result.keypoints is not None:
+                self._visualise_keypoints(frame, result)
+
             for _, (box, conf, cls_id) in enumerate(zip(boxes, confidences, class_ids)):
                 x1, y1, x2, y2 = box
                 label = f"{self._model.labels[cls_id]}: {conf:.2f}"
@@ -48,3 +52,14 @@ class YoloDetector(Detector):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
         cv2.imshow("Detection", frame.frame)
+
+    def _visualise_keypoints(self, frame: FrameData, result: Any) -> None:
+        """Visualize keypoints on the frame."""
+        for i, kpts in enumerate(result.keypoints.data):
+            if kpts is not None:
+                kpts = kpts.cpu().numpy()
+                # Draw each keypoint
+                for x, y, conf in kpts:
+                    if conf > 0.5:
+                        cv2.circle(
+                            frame.frame, (int(x), int(y)), 5, (0, 0, 255), -1)

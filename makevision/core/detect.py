@@ -8,7 +8,7 @@ from .reader import FrameData
 class Detector(ABC):
     """Abstract base class for detectors."""
 
-    def __init__(self, model: Model, streaming: Optional[bool]) -> None:
+    def __init__(self, model: Optional[Model], streaming: Optional[bool]) -> None:
         """
         Initialize the detector with a model.
         Args:
