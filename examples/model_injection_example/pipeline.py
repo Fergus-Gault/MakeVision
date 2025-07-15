@@ -13,7 +13,7 @@ class ExamplePipeline(Pipeline):
 
         logging.basicConfig(level=logging.INFO)
 
-        calibrator.calibrate("./wide_angle_cam/")
+        calibrator.calibrate()
 
         while True:
             success, frame = reader.read()
@@ -34,4 +34,5 @@ class ExamplePipeline(Pipeline):
 
 
 if __name__ == "__main__":
+    import makevision
     makevision.start()

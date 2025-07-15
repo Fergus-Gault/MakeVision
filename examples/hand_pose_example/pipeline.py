@@ -12,8 +12,12 @@ class HandPosePipeline(Pipeline):
             if not success:
                 break
 
+            frame.color_space = "RGB"
+
             # Detect hand poses
             detections = detector.detect(frame)
+
+            frame.color_space = "BGR"
 
             # Visualize the detections
             detector.visualize(frame, detections)
