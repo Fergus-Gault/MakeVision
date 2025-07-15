@@ -2,7 +2,7 @@ import json
 from typing import Dict
 
 from makevision.core import Data, FileManager
-from makevision.core.exceptions import FileNotJsonError
+from makevision.exceptions import FileNotJsonError
 
 
 class JsonFileManager(FileManager):

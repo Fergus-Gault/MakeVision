@@ -11,7 +11,6 @@ from makevision.calibration import WebcamCalibrator
 from makevision.core import (
     Calibrator,
     Detector,
-    exceptions,
     Filter,
     Model,
     Network,
@@ -21,6 +20,7 @@ from makevision.core import (
     State,
 )
 from makevision.model import OnnxModel, TfModel, YoloModel
+from makevision.exceptions import *
 
 logger = logging.getLogger(__name__)
 

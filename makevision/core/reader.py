@@ -1,16 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Tuple
-
-import numpy as np
-
-
-class FrameData(ABC):
-    """Generic class for frame data."""
-    @property
-    @abstractmethod
-    def frame(self) -> np.ndarray:
-        """Get the frame data."""
-        pass
+from makevision.types import FrameData
 
 
 class Reader(ABC):

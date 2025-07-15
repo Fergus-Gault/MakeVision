@@ -3,7 +3,7 @@ import yaml
 from typing import Dict
 
 from makevision.core import Data, FileManager
-from makevision.core.exceptions import FileNotYamlError
+from makevision.exceptions import FileNotYamlError
 
 
 class YamlFileManager(FileManager):
