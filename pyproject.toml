@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "makevision"
-version = "0.0.1-beta"
+version = "0.0.1-beta-post1"
 authors = [
     { name = "Fergus Gault", email = "gaultfergus@gmail.com"}
 ]
@@ -13,7 +13,7 @@ readme = "README.md"
 license = "GPL-2.0"
 requires-python = ">=3.8"
 dependencies = [
-    "numpy",
+    "numpy==1.26.0",
     "opencv-contrib-python",
     "pyyaml",
 ]
