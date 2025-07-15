@@ -122,7 +122,7 @@ class CustomConfigPipeline(Pipeline):
         calibrator = WebcamCalibrator("./calibration/camera_params.yaml")
         
         # Rest of your pipeline logic using these components
-        calibrator.calibrate("./calibration_images/")
+        calibrator.calibrate()
         
         while True:
             success, frame = reader.read()
