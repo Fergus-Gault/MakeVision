@@ -12,23 +12,49 @@ class YoloDetector(Detector):
         self.use_half = True if self.model.device == 'cuda' else False
         self.streaming = streaming
 
-    def detect(self, frame: FrameData, verbose: bool = False, conf: float = 0.5, iou: float = 0.45, imgsz: int = 640) -> List:
-        """Detect objects in the given frame using the YOLO model."""
+    def detect(self, frame: FrameData, **kwargs) -> List:
+        """
+        Detect objects in the given frame using the YOLO model.
 
-        # Optimize for inference speed in video processing
-        results = self.model(
-            frame.frame,                        # FrameData object containing the frame
-            verbose=verbose,                    # Suppress verbose output
-            conf=conf,                          # Lower confidence threshold for faster processing
-            iou=iou,                            # Adjusted IOU threshold
-            # Use GPU if available (0), or 'cpu'
-            device=self.model.device,
-            stream=self.streaming,              # Enable streaming mode for real-time processing
-            imgsz=imgsz,                        # Resize images to 640x640 for faster processing
-            stream_buffer=not self.streaming,   # Buffer for streaming mode
-            half=self.use_half,                 # Use half precision for faster inference on GPU
-            agnostic_nms=True,                  # Enable class-agnostic NMS for faster processing
-        )
+        Args:
+            frame: FrameData object containing the frame
+            **kwargs: Any parameters to pass to the YOLO model
+                      Common options include: verbose, conf, iou, imgsz, agnostic_nms, etc.
+
+        Returns:
+            List of detection results
+        """
+        # Set default parameters with instance defaults
+        params = {
+            'verbose': False,           # Display detection information
+            'conf': 0.5,                # Confidence threshold
+            'iou': 0.45,                # IoU threshold for NMS
+            'device': self.model.device,  # Device to run on (cuda or cpu)
+            'stream': self.streaming,   # Stream mode (True/False)
+            'imgsz': 640,               # Input image size
+            'stream_buffer': not self.streaming,  # Buffer all streaming frames
+            'half': self.use_half,      # Use FP16 half-precision inference
+            'agnostic_nms': True,       # Class-agnostic NMS
+            'max_det': 300,             # Maximum detections per image
+            'classes': None,            # Filter by class (None = all classes)
+            'augment': False,           # Augmented inference
+            'retina_masks': False,      # Use high-resolution segmentation masks
+            'vid_stride': 1,            # Video frame-rate stride
+            'visualize': False,         # Visualize model features
+            'show': False,              # Show results if visualize
+            'save': False,              # Save results to *.txt
+            'save_conf': False,         # Save confidences in --save-txt labels
+            'save_crop': False,         # Save cropped prediction boxes
+            'line_width': None,         # The line width of the bounding boxes
+            'show_labels': False,        # Show labels
+            'show_conf': False,          # Show confidences
+        }
+
+        # Override defaults with any provided kwargs
+        params.update(kwargs)
+
+        # Perform detection with provided parameters
+        results = self.model(frame.frame, **params)
 
         return list(results)
 
