@@ -167,13 +167,13 @@ class CalibrationData(Data):
 
 class Calibrator(ABC):
     @abstractmethod
-    def calibrate(self, images_path: str, aruco_board: ArucoBoardDef, *args, **kwargs) -> None:
+    def calibrate(self, images_path: str = None, aruco_board: ArucoBoardDef = ArucoBoardDef(), *args, **kwargs) -> None:
         """
-        Calibrate the camera using the images in the specified path.
+        Calibrate the camera using either existing calibration data or images in the specified path.
 
         Args:
-            images_path (str): Path to the images for calibration.
-            aruco_board (ArucoBoardDef): Aruco board definition.
+            images_path (str, optional): Path to the images for calibration. Required only if no calibration data is available.
+            aruco_board (ArucoBoardDef, optional): Aruco board definition. Defaults to ArucoBoardDef().
         """
         pass
 

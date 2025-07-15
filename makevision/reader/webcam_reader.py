@@ -3,23 +3,15 @@ import numpy as np
 from typing import Tuple
 
 from makevision.core import Reader, FrameData
-from makevision.core.exceptions import InvalidWebcamSourceError
+from makevision.types import ColorSpace
+from makevision.exceptions import InvalidWebcamSourceError
 
 
 class WebcamFrameData(FrameData):
     """Class for webcam frame data."""
 
-    def __init__(self, frame: np.ndarray):
-        self._frame = frame
-
-    @property
-    def frame(self) -> np.ndarray:
-        """Get the frame data."""
-        return self._frame
-
-    @frame.setter
-    def frame(self, value: np.ndarray):
-        self._frame = value
+    def __init__(self, frame: np.ndarray, color_space: ColorSpace) -> None:
+        super().__init__(frame, color_space)
 
 
 class WebcamReader(Reader):
@@ -39,7 +31,7 @@ class WebcamReader(Reader):
         if not success:
             return False, None
 
-        return True, self.frame_type(frame, *args, **kwargs)
+        return True, self.frame_type(frame, ColorSpace.BGR, *args, **kwargs)
 
     def release(self):
         """Releases the webcam."""

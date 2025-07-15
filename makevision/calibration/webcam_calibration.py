@@ -11,21 +11,27 @@ from makevision.file_handling import CalibrationDataFileManager, DefaultFileMana
 class WebcamCalibrator(Calibrator):
     """Calibrates a webcam using ChArUco boards."""
 
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, calibration_data: CalibrationData = None) -> None:
         file_manager_factory = DefaultFileManagerFactory()
         self.file_manager = CalibrationDataFileManager(
             file_manager_factory, path)
-        self.calibration_data = None
+        self.calibration_data: CalibrationData = calibration_data
         self.undistort_maps = None
+        if self.calibration_data:
+            self.undistort_maps = self.calibration_data.calculate_undistort_maps()
 
-    def calibrate(self, images_path: str, aruco_board_def: ArucoBoardDef = ArucoBoardDef()) -> None:
+    def calibrate(self, images_path: str = None, aruco_board_def: ArucoBoardDef = ArucoBoardDef()) -> None:
+        if self.calibration_data:
+            return
+
         self.calibration_data = self.file_manager.load()
         if self.calibration_data:
             self.undistort_maps = self.calibration_data.calculate_undistort_maps()
             return
 
         if not images_path:
-            raise ValueError("No images path provided for calibration.")
+            raise ValueError(
+                "No calibration data available and no images path provided for calibration.")
 
         # Define ChArUco board
         aruco_board = self._get_aruco_board(aruco_board_def)

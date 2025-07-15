@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from .model import Model
-from .reader import FrameData
+from makevision.types import FrameData
 
 
 class Detector(ABC):
@@ -12,8 +12,8 @@ class Detector(ABC):
         """
         Initialize the detector with a model.
         Args:
-            model (Model): The model to use for detection.
-            streaming (bool): Whether to use streaming mode.
+            model (Optional[Model]): The model to use for detection. If None, detector will not perform model inference.
+            streaming (Optional[bool]): Whether to use streaming mode, which may affect performance optimization.
         """
         self.model = model
         self.streaming = streaming
@@ -23,7 +23,7 @@ class Detector(ABC):
         """
         Detect objects in the given frame.
         Args:
-            frame (np.ndarray): The frame to detect objects in. 
+            frame (FrameData): The frame object to detect objects in. 
         Returns:
             result (List): A list of detections.
         """
@@ -35,6 +35,6 @@ class Detector(ABC):
         Visualize the detection results.
         Args:
             frame (FrameData): The frame to visualize.
-            results (List): Detection results to visualize.
+            results (Optional[List]): Detection results to visualize.
         """
         pass

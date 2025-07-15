@@ -4,22 +4,14 @@ from typing import Tuple
 import time
 
 from makevision.core import Reader, FrameData
+from makevision.types import ColorSpace
 
 
 class VideoFrameData(FrameData):
     """Class for video frame data."""
 
-    def __init__(self, frame: np.ndarray):
-        self._frame = frame
-
-    @property
-    def frame(self) -> np.ndarray:
-        """Get the frame data."""
-        return self._frame
-
-    @frame.setter
-    def frame(self, value: np.ndarray):
-        self._frame = value
+    def __init__(self, frame: np.ndarray, color_space: ColorSpace) -> None:
+        super().__init__(frame, color_space)
 
 
 class VideoReader(Reader):
@@ -57,7 +49,7 @@ class VideoReader(Reader):
                 self.reset()
                 return self.read()
             return False, None
-        return True, self.frame_type(frame, *args, **kwargs)
+        return True, self.frame_type(frame, ColorSpace.BGR, *args, **kwargs)
 
     def release(self) -> None:
         """Release the video capture object."""
