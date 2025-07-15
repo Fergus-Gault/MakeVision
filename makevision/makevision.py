@@ -17,21 +17,19 @@ def start():
 
     # Set up argument parser
     parser = argparse.ArgumentParser(description="Run the basic pipeline.")
-    parser.add_argument("--input", required=False,
+    parser.add_argument("--input", "--i", required=False,
                         help="Type of input (webcam or video file).")
     parser.add_argument("--loop", action="store_true",
                         help="Loop the video input.")
-    parser.add_argument("--pipeline", required=False,
-                        help="Specify the pipeline to use.")
-    parser.add_argument("--calibration-data", required=False,
+    parser.add_argument("--calibration-data", "--cd", required=False,
                         help="Path to the calibration data file.")
-    parser.add_argument("--model", required=False,
+    parser.add_argument("--model", "--m", required=False,
                         help="Path to the YOLO model file.")
     parser.add_argument("--network", required=False,
                         help="Path to the network configuration file.")
     parser.add_argument("--filter", required=False,
                         help="Specify the filter to use.")
-    parser.add_argument("--obstruction-detector", required=False,
+    parser.add_argument("--obstruction-detector", "--od", required=False,
                         help="Specify the obstruction detector to use.")
     parser.add_argument("--state", required=False,
                         help="Specify the state to use.")
